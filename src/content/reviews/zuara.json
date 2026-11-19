@@ -1,0 +1,186 @@
+{
+  "name": "Zuara",
+  "city": "Madrid",
+  "headline": "La mejor barra de sushi de Madrid estrena casa, y aún le falta rodaje",
+  "score": 9.5,
+  "price": "Más de 100€",
+  "plans": [],
+  "venue": [
+    "De barra"
+  ],
+  "cuisine": [
+    "Japonés",
+    "De Menú Degustación"
+  ],
+  "paid": "709€",
+  "avgPrice": "195€ (menú)",
+  "visit": "OCTUBRE 2026",
+  "year": 2026,
+  "month": 10,
+  "address": [],
+  "images": [
+    "/img/ig/zuara-0.webp",
+    "/img/ig/zuara-1.webp",
+    "/img/ig/zuara-2.webp",
+    "/img/ig/zuara-3.webp",
+    "/img/ig/zuara-4.webp",
+    "/img/ig/zuara-5.webp",
+    "/img/ig/zuara-6.webp",
+    "/img/ig/zuara-7.webp",
+    "/img/ig/zuara-8.webp",
+    "/img/ig/zuara-9.webp",
+    "/img/ig/zuara-10.webp",
+    "/img/ig/zuara-11.webp",
+    "/img/ig/zuara-12.webp",
+    "/img/ig/zuara-13.webp",
+    "/img/ig/zuara-14.webp",
+    "/img/ig/zuara-15.webp",
+    "/img/ig/zuara-16.webp"
+  ],
+  "excerpt": "Llevaba más de un año echando de menos la que para mí ha sido la mejor barra de sushi de Madrid.",
+  "body": [
+    {
+      "type": "p",
+      "text": "Cena para 2, a Máximo Dolor."
+    },
+    {
+      "type": "p",
+      "text": "Llevaba más de un año echando de menos la que para mí ha sido la mejor barra de sushi de Madrid."
+    },
+    {
+      "type": "p",
+      "text": "Y es que en 2025 se despidieron de su anterior ubicación en la calle Pensamiento, donde consiguieron una más que merecida estrella Michelin, para instalarse este pasado verano 2026 en el Hyatt Regency Hesperia (el mismo hotel donde están Smoked Room y Leña)."
+    },
+    {
+      "type": "p",
+      "text": "Siendo honesto, la nueva ubicación me ha dejado bastante frío."
+    },
+    {
+      "type": "p",
+      "text": "Para llegar al restaurante hay que acceder por la entrada principal del hotel, atravesar todo el hall, pasando por la recepción, y al fondo a la derecha se encuentra Zuara. Un recorrido que, estéticamente, no resulta especialmente atractivo."
+    },
+    {
+      "type": "p",
+      "text": "Y una vez dentro, el restaurante tampoco me pareció demasiado acogedor. Es cierto que acababan de abrir y seguramente todavía tengan que darle más calidez a la decoración, pero por ahora se respira demasiado ese ambiente de restaurante de hotel."
+    },
+    {
+      "type": "p",
+      "text": "Pasando a la experiencia gastronómica, mantienen su formato de menú único obligatorio (195€), con todos los comensales comenzando y comiendo a la vez, en dos únicos horarios: 14:15 y 21:15."
+    },
+    {
+      "type": "p",
+      "text": "Es un concepto muy formal y estructurado, que entiendo perfectamente y que encaja con la filosofía japonesa del maestro David Arauz, pero que personalmente me resulta algo rígido en un momento en el que la restauración tiende cada vez más a ofrecer experiencias flexibles y adaptadas al cliente."
+    },
+    {
+      "type": "p",
+      "text": "De hecho, medio en broma, medio en serio, David explica al comienzo del menú que cada nigiri debe comerse en el momento en el que se sirve y que, si no lo haces, te lo retiran."
+    },
+    {
+      "type": "p",
+      "text": "Para quienes prefieran una experiencia diferente, han creado una zona de mesas llamada Teburu."
+    },
+    {
+      "type": "p",
+      "text": "En cuanto a la cocina, como era de esperar, el nivel fue sobresaliente. Aunque tuve la sensación de que todavía necesitaban algo más de rodaje para recuperar esa matrícula de honor que habían alcanzado en su anterior ubicación."
+    },
+    {
+      "type": "p",
+      "text": "Esta cena fue antes de verano, con la nueva barra recién inaugurada, donde el maestro ofrece un único menú de 195€, al que se pueden añadir algunos extras:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "De la parte de entrantes, la torrija de pan brioche con toro y caviar de Caspian Pearl es MÁXIMO DIOS.",
+        "Como extra de nigiri (18€), hay que pedir el Toro-Tuétano-Caviar.",
+        "Lomo bajo Miyazaki. También es un extra del menú y cuesta 80€ por persona. Está muy rico, pero quizás para tomar solo un par de bocados, ya que entre la potencia y la grasa acaba saturando un poco.",
+        "Hirame no robata yaki (Lenguado). Excelente.",
+        "Chawanmushi de Cigala.",
+        "Kaiso salad de algas."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Respecto al sushi, el menú incluye unas 17 piezas. Estas son las que nos sirvieron:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Madai (Pámpano).",
+        "Hiramasa con lima (Seriola).",
+        "Hamachi con yuzu kosho (Pez limón).",
+        "Shime saba (Caballa).",
+        "Katsuo kemuri (Bacoreta ahumada).",
+        "Binnaga (Bonito blanco del norte).",
+        "Iwashi (Sardina).",
+        "Ika con limón (Calamar).",
+        "Ama ebi (Quisquilla).",
+        "Suzuki (Lubina).",
+        "Kuruma ebi (Langostino).",
+        "Akami (Atún).",
+        "Chu toro (Ventresca de atún).",
+        "Akami con shio koji (Atún macerado).",
+        "Unagi kabayaki (Anguila en tare).",
+        "Toro aburi (Ventresca de atún marcada).",
+        "Temaki de atún y tuétano."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "De postre, Kogashi bata (Helado de mantequilla)."
+    },
+    {
+      "type": "p",
+      "text": "Magnífico el tándem que forman David Arauz en la cocina y Álvaro Prieto al frente de la sala y la bodega."
+    },
+    {
+      "type": "p",
+      "text": "Muy buena carta de vinos, con referencias de muchísimo nivel y muchas cosas interesantes para disfrutar."
+    },
+    {
+      "type": "p",
+      "text": "Nosotros nos dimos un auténtico homenaje con tres pepinos, entre ellos dos de mis vinos blancos favoritos del mundo:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Champán de Chartogne-Taillet.",
+        "Aligoté de Coche-Dury.",
+        "Meursault de Bernard Bonin."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Y, por supuesto, todo servido en cristalería fina, como debe ser."
+    },
+    {
+      "type": "p",
+      "text": "Por ahora, 9,5 LUNAS, con la convicción de que tienen todo lo necesario para volver al 10."
+    }
+  ],
+  "words": 642,
+  "instagram": {
+    "kind": "new",
+    "date": "2026-10-22",
+    "handle": "zuarasushi",
+    "posts": [
+      {
+        "id": "Dey5MDliGuw",
+        "url": "https://www.instagram.com/alberto_deluna/p/Dey5MDliGuw/",
+        "date": "2026-10-22",
+        "kind": "opinion"
+      },
+      {
+        "id": "Deyz3rViC9F",
+        "url": "https://www.instagram.com/alberto_deluna/p/Deyz3rViC9F/",
+        "date": "2026-10-22",
+        "kind": "dishes"
+      },
+      {
+        "id": "Dey0ZpFIKqj",
+        "url": "https://www.instagram.com/alberto_deluna/p/Dey0ZpFIKqj/",
+        "date": "2026-10-22",
+        "kind": "drinks"
+      }
+    ]
+  }
+}

@@ -1,0 +1,212 @@
+---
+import { url } from "@/lib/url"
+import { absolute, INSTAGRAM } from "@/lib/seo"
+import { HANDLE } from "@/lib/seal"
+import "@/styles/global.css"
+import SiteNav from "@/components/site-nav.astro"
+import BrandMark from "@/components/brand-mark.astro"
+import SwapLabel from "@/components/swap-label.astro"
+// Preloaded so the headings don't reflow when the fonts arrive
+import archivoUrl from "@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url"
+import serifItalicUrl from "@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2?url"
+
+interface Props {
+  title?: string
+  description?: string
+  /** Share image: a path on this site or a full URL (1200×630 is best) */
+  image?: string
+  imageAlt?: string
+  /** "article" for a review, "website" for everything else */
+  type?: "website" | "article"
+  /** Keep the page out of search results (it stays reachable) */
+  noindex?: boolean
+  /** Schema.org data for search engines, one object or several */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[]
+}
+
+const {
+  title = "Alberto de Luna",
+  description = "Restaurantes puntuados en lunas por Alberto de Luna desde 2010.",
+  image = "/og/sitio.png",
+  imageAlt = "Alberto de Luna: restaurantes puntuados en lunas",
+  type = "website",
+  noindex = false,
+  jsonLd,
+} = Astro.props
+
+// Always set: astro.config.mjs defaults it to the production domain
+const site = Astro.site!
+// One address per page: the built pages all live at /path/ (base included)
+const path = Astro.url.pathname
+  .replace(/\/index\.html$/, "/")
+  .replace(/\/?$/, "/")
+const canonical = new URL(path, site).href
+const imageUrl = absolute(image)
+const preview = Boolean(import.meta.env.PUBLIC_PREVIEW)
+// "</script>" inside a string must not end the JSON-LD block early
+const ld = jsonLd ? JSON.stringify(jsonLd).replaceAll("<", "\\u003c") : null
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href={url("/favicon.svg")} />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={archivoUrl}
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href={serifItalicUrl}
+      crossorigin
+    />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {/* The GitHub Pages preview stays out of search; on the real site only
+        the pages that ask for it do */}
+    {preview || noindex ? (
+      <meta name="robots" content="noindex, follow" />
+    ) : (
+      <link rel="canonical" href={canonical} />
+    )}
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="apple-touch-icon" href={url("/apple-touch-icon.png")} />
+    {!preview && <link rel="sitemap" href={url("/sitemap-index.xml")} />}
+
+    <meta property="og:site_name" content="Alberto de Luna" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+    {ld && <script type="application/ld+json" set:html={ld} />}
+    <script is:inline>
+      // Hidden start states only apply when the animations will run
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("motion")
+        try {
+          if (sessionStorage.getItem("luna:intro-seen") === "1")
+            document.documentElement.classList.add("intro-seen")
+        } catch {}
+      }
+    </script>
+  </head>
+  <body>
+    <SiteNav />
+    <div class="cursor" data-cursor-dot aria-hidden="true">
+      <span></span>
+    </div>
+    <slot />
+    <footer class="site-footer">
+      <div class="footer-brand-wrap">
+        <a href={url("/")} aria-label="Alberto de Luna, inicio">
+          <BrandMark variant="full" class="footer-brand" />
+        </a>
+      </div>
+      <span>Alberto de Luna · Restaurantes en lunas</span>
+      <a href={url("/como-puntuo")}>
+        <SwapLabel text="Cómo puntúo" />
+      </a>
+      <a href={INSTAGRAM} target="_blank" rel="noopener">
+        <SwapLabel text={`Instagram ${HANDLE}`} />
+      </a>
+      <span>Demo de Kaizencode</span>
+    </footer>
+    <script>
+      import { initMotion } from "@/lib/animations"
+      initMotion()
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .cursor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 90;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border-radius: 50%;
+    background: var(--glow);
+    pointer-events: none;
+    display: grid;
+    place-items: center;
+    color: var(--on-glow);
+    font: 800 11px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+    opacity: 0;
+    transition:
+      width 0.3s,
+      height 0.3s,
+      margin 0.3s;
+  }
+  .cursor span {
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .cursor.is-big {
+    width: 110px;
+    height: 110px;
+    margin: -55px 0 0 -55px;
+  }
+  .cursor.is-big span {
+    opacity: 1;
+  }
+  @media (hover: none), (pointer: coarse) {
+    .cursor {
+      display: none;
+    }
+  }
+  .site-footer .footer-brand-wrap {
+    flex-basis: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+    margin-bottom: 20px;
+  }
+  .site-footer .footer-brand-wrap a {
+    padding: 8px;
+    margin: 0;
+    color: var(--moon);
+  }
+  .site-footer .footer-brand-wrap a:hover {
+    color: var(--glow);
+  }
+  .site-footer a {
+    padding: 13px 0;
+    margin: -13px 0;
+    color: inherit;
+    text-decoration: none;
+  }
+  .site-footer a:hover {
+    color: var(--moon);
+  }
+  .site-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 40px 24px 32px;
+    font: 600 12px/1.5 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--grey);
+    background: var(--ink);
+  }
+</style>

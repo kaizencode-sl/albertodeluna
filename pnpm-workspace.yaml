@@ -1,0 +1,15 @@
+packages: []
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+  msw: false
+
+minimumReleaseAgeExclude:
+  - '@astrojs/markdown-satteri@0.4.9'
+  - '@astrojs/runtime@0.1.1'
+  - '@astrojs/vite-plugin-astro@0.1.2'
+
+overrides:
+  # astro2tsx (via @astrojs/check) resolved its peer to a 2.0 beta that crashes astro check
+  "@emnapi/runtime": 1.11.3

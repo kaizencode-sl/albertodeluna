@@ -1,0 +1,160 @@
+{
+  "name": "Casa Lista",
+  "city": "Madrid",
+  "headline": "Bistró dentro de un club privado donde se cena bastante bien",
+  "score": 8,
+  "price": "Más de 50€",
+  "plans": [
+    "Para ir con amigos",
+    "Para comida de negocios"
+  ],
+  "venue": [
+    "De moda",
+    "Chulo"
+  ],
+  "cuisine": [
+    "De cocina estandar"
+  ],
+  "paid": null,
+  "avgPrice": "60€",
+  "visit": "OCTUBRE 2026",
+  "year": 2026,
+  "month": 10,
+  "address": [],
+  "images": [
+    "/img/ig/casa-lista-0.webp",
+    "/img/ig/casa-lista-1.webp",
+    "/img/ig/casa-lista-2.webp",
+    "/img/ig/casa-lista-3.webp",
+    "/img/ig/casa-lista-4.webp",
+    "/img/ig/casa-lista-5.webp",
+    "/img/ig/casa-lista-6.webp",
+    "/img/ig/casa-lista-7.webp",
+    "/img/ig/casa-lista-8.webp",
+    "/img/ig/casa-lista-9.webp",
+    "/img/ig/casa-lista-10.webp",
+    "/img/ig/casa-lista-11.webp",
+    "/img/ig/casa-lista-12.webp",
+    "/img/ig/casa-lista-13.webp",
+    "/img/ig/casa-lista-14.webp",
+    "/img/ig/casa-lista-15.webp"
+  ],
+  "excerpt": "En la esquina de Lagasca con Ortega y Gasset ha abierto al público este restaurante situado dentro del club privado VEGA, conocido, entre otras cosas, por tener a Íñigo Onieva, marido de Tamara Falcó, entre sus…",
+  "body": [
+    {
+      "type": "p",
+      "text": "Invitación. Cena para 3."
+    },
+    {
+      "type": "p",
+      "text": "En la esquina de Lagasca con Ortega y Gasset ha abierto al público este restaurante situado dentro del club privado VEGA, conocido, entre otras cosas, por tener a Íñigo Onieva, marido de Tamara Falcó, entre sus fundadores."
+    },
+    {
+      "type": "p",
+      "text": "Para acceder a Casa Lista no es necesario ser miembro del club, de modo que funciona como un restaurante independiente, aunque integrado en el espacio que ocupa VEGA."
+    },
+    {
+      "type": "p",
+      "text": "Una fórmula que se está poniendo muy de moda en Madrid, con clubes privados que conviven con restaurantes abiertos al público."
+    },
+    {
+      "type": "p",
+      "text": "El espacio es muy chulo, con una decoración cuidada."
+    },
+    {
+      "type": "p",
+      "text": "Reconozco que tenía mis dudas sobre la comida, especialmente después de mi experiencia en Casa Salesas, el otro restaurante vinculado a Íñigo Onieva, que no me convenció cuando lo visité hace un par de años. Pero debo decir que aquí cenamos bastante bien."
+    },
+    {
+      "type": "p",
+      "text": "Carta amplia y variada donde se mezclan la cocina de mercado, la española y la italiana, con platos pensados para todos los públicos, bien ejecutados y con proveedores de primer nivel como Pampeana o Discarlux."
+    },
+    {
+      "type": "p",
+      "text": "Os enseño todo lo que comimos:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Paccheri genovese. De entre las distintas pastas que ofrecen, nos recomendaron esta y la verdad es que me gustó muchísimo.",
+        "Katsu Sando de solomillo. Muy rico, con la carne tierna, rebozado limpio y el pan ligero, algo que no siempre es fácil de conseguir.",
+        "Almejas al vino fino. Buenas almejas, bien preparadas.",
+        "Carnes. Probamos una chuleta de rubia gallega, a la que le faltó algo de intensidad de sabor, y un ojo de bife de Pampeana que estaba muy bueno.",
+        "Gilda con anchoa de Santoña 00 y salmorejo.",
+        "Tartar de atún de almadraba con carpaccio de aguacate y huevo frito de Cobardes y Gallinas."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Y buen nivel también en los postres:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Helado italiano de pistacho elaborado al momento.",
+        "Flan con chantilly.",
+        "Cookie con helado de vainilla.",
+        "Torrija en pan de flor dulce con crema inglesa.",
+        "Tarta de queso."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Carta de vinos bien pensada, que además cuenta con una selección personal de la sumiller, Rocío, con distintas chucherías que van entrando."
+    },
+    {
+      "type": "p",
+      "text": "Permiten el descorche por 50€."
+    },
+    {
+      "type": "p",
+      "text": "Nosotros optamos primero por un champán de Bérêche que siempre cumple, y después por un Pommard de Pacalet, un productor de Borgoña que me gusta mucho."
+    },
+    {
+      "type": "p",
+      "text": "Hay cristalería fina, algo que siempre se agradece. Y también tienen buena coctelería."
+    },
+    {
+      "type": "p",
+      "text": "Abre de martes a sábado, ininterrumpidamente desde el mediodía. Y me contaron que han empezado a dar desayunos, lo cual puede ser buena opción para una reunión de trabajo o ir el fin de semana en familia."
+    },
+    {
+      "type": "p",
+      "text": "Por su ubicación, el espacio y el tipo de cocina, me parece una opción interesante tanto para una comida más tranquila y formal al mediodía como para una cena con amigos por la noche, cuando la propuesta busca un ambiente más animado, con DJ los fines de semana."
+    },
+    {
+      "type": "p",
+      "text": "Ticket medio alrededor de los 60€."
+    },
+    {
+      "type": "p",
+      "text": "8 LUNAS."
+    }
+  ],
+  "words": 491,
+  "instagram": {
+    "kind": "new",
+    "date": "2026-10-19",
+    "handle": "bistro_casalista",
+    "posts": [
+      {
+        "id": "DerOiVhCBOV",
+        "url": "https://www.instagram.com/alberto_deluna/p/DerOiVhCBOV/",
+        "date": "2026-10-19",
+        "kind": "opinion"
+      },
+      {
+        "id": "DerFH-6iNWB",
+        "url": "https://www.instagram.com/alberto_deluna/p/DerFH-6iNWB/",
+        "date": "2026-10-19",
+        "kind": "dishes"
+      },
+      {
+        "id": "DerN3j_iMI5",
+        "url": "https://www.instagram.com/alberto_deluna/p/DerN3j_iMI5/",
+        "date": "2026-10-19",
+        "kind": "drinks"
+      }
+    ]
+  }
+}

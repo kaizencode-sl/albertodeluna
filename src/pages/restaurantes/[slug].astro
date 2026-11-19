@@ -1,0 +1,965 @@
+---
+import { url } from "@/lib/url"
+import type { GetStaticPaths } from "astro"
+import Layout from "@/layouts/main.astro"
+import { restaurantWeb, reviewGraph } from "@/lib/seo"
+import Moon from "@/components/moon.astro"
+import ReviewRow from "@/components/review-row.astro"
+import RollingScore from "@/components/rolling-score.astro"
+import { SEAL_MIN, sealUrl } from "@/lib/seal"
+import geo from "@/data/geo.json"
+import dishPhotos from "@/data/dish-photos.json"
+import {
+  getReviews,
+  formatScore,
+  shortPlan,
+  srcset,
+  vtName,
+  type Review,
+} from "@/lib/reviews"
+
+export const getStaticPaths = (async () => {
+  const reviews = await getReviews()
+  return reviews.map((review) => ({
+    params: { slug: review.id },
+    props: { review, reviews },
+  }))
+}) satisfies GetStaticPaths
+
+interface Props {
+  review: Review
+  reviews: Review[]
+}
+
+const { review, reviews } = Astro.props
+const r = review.data
+
+const photos = r.images
+// A dish with its own photo shows it, captioned, right after its list,
+// and that photo then leaves the rest so it isn't shown twice
+const dishMap: Record<string, string> =
+  (dishPhotos as Record<string, Record<string, string>>)[review.id] ?? {}
+const dishPhoto = (item: string) => {
+  const text = item.toLowerCase()
+  const key = Object.keys(dishMap).find((k) => text.includes(k))
+  return key ? url(dishMap[key]!) : undefined
+}
+type Shot = { src: string; caption?: string }
+const dishShots = (items: string[]) => {
+  const seen = new Set<string>()
+  return items.flatMap((item) => {
+    const src = dishPhoto(item)
+    if (!src || seen.has(src)) return []
+    seen.add(src)
+    return [{ src, caption: item.replace(/\.$/, "") }]
+  })
+}
+const inDishes = new Set(
+  r.body.flatMap((b) =>
+    b.type === "list" ? dishShots(b.items).map((s) => s.src) : []
+  )
+)
+// Sizes the title so no word has to break across lines
+const longestWord = Math.max(...r.name.split(/\s+/).map((w) => w.length))
+const [cover, ...gallery] = photos.filter(
+  (src, i) => i === 0 || !inDishes.has(src)
+)
+
+// Every photo lives in the text, in one format: alternating a wide photo and
+// a pair. They spread out roughly one set every two paragraphs; what doesn't
+// fit closes the text, so nothing piles up in a separate gallery.
+const sets = (shots: Shot[], startWide = true) => {
+  const out: Shot[][] = []
+  for (let i = 0, k = 0; i < shots.length; k++) {
+    const one = (k % 2 === 0) === startWide || shots.length - i < 2
+    out.push(shots.slice(i, i + (one ? 1 : 2)))
+    i += one ? 1 : 2
+  }
+  return out
+}
+const flow = sets(gallery.slice(0, 16).map((src) => ({ src })))
+const paragraphs = r.body
+  .map((b, i) => (b.type === "p" && i > 0 ? i : -1))
+  .filter((i) => i >= 0 && i < r.body.length - 1)
+const slots = Math.min(flow.length, Math.floor(paragraphs.length / 2))
+// Block index → the photo sets shown after it
+const after = new Map<number, Shot[][]>()
+const put = (i: number, s: Shot[][]) =>
+  after.set(i, [...(after.get(i) ?? []), ...s])
+r.body.forEach((b, i) => {
+  if (b.type === "list") put(i, sets(dishShots(b.items), false))
+})
+flow.forEach((set, k) =>
+  put(
+    k < slots
+      ? paragraphs[Math.floor(((k + 1) * paragraphs.length) / (slots + 1))]!
+      : r.body.length - 1,
+    [set]
+  )
+)
+const hasPhotos = after.size > 0
+
+const visit = r.visit
+  ? r.visit.toLowerCase().replace(/^./, (c) => c.toUpperCase())
+  : null
+const chips = [...r.plans.map(shortPlan), ...r.venue, ...r.cuisine]
+
+const related = reviews
+  .filter(
+    (o) =>
+      o.id !== review.id && o.data.city === r.city && o.data.images.length >= 4
+  )
+  .sort((a, b) => (b.data.score ?? 0) - (a.data.score ?? 0))
+  .slice(0, 3)
+
+const point = (
+  geo as Record<string, { lat: number; lon: number; approx?: boolean }>
+)[review.id]
+const onMap = point && !point.approx && r.score !== null
+const hasSeal = (r.score ?? 0) >= SEAL_MIN
+
+// Reviews that are also on Instagram link to Alberto's posts
+const ig = r.instagram
+const web = restaurantWeb(r.address)
+
+const description =
+  r.excerpt || `${r.name}: ${r.headline}. ${formatScore(r.score)} lunas.`
+
+// Shared as its cover photo, or a card with its moon when it has none
+// (as a JPG for the Instagram photos: some apps won't preview WebP)
+const shareImage = cover
+  ? cover.replace(/(\/img\/ig\/[^/]+)\.webp$/, "$1.jpg")
+  : `/og/${review.id}.png`
+const jsonLd = reviewGraph(review, {
+  image: cover,
+  geo: point && !point.approx ? point : null,
+})
+---
+
+<Layout
+  title={`${r.name}, ${r.city} · Alberto de Luna`}
+  description={description}
+  type="article"
+  image={shareImage}
+  imageAlt={
+    cover ? `Plato en ${r.name}` : `${r.name}: ${formatScore(r.score)} lunas`
+  }
+  jsonLd={jsonLd}
+>
+  <main>
+    <header class="head" data-review-head data-score={r.score ?? ""}>
+      <div
+        class="media"
+        data-review-media
+        style={`view-transition-name: ${vtName("photo", review.id)}`}
+      >
+        {cover ? (
+          <img
+            src={cover}
+            srcset={srcset(cover)}
+            sizes="100vw"
+            alt={`Plato en ${r.name}`}
+            fetchpriority="high"
+          />
+        ) : (
+          <div class="no-photo">
+            <Moon score={r.score ?? 10} glow class="no-photo-moon" />
+          </div>
+        )}
+      </div>
+      <div class="head-inner">
+        <div class="head-top">
+          <a class="back" href={url("/restaurantes")}>
+            ← Todas las reseñas
+          </a>
+          <button
+            type="button"
+            class="share"
+            data-share
+            data-title={`${r.name} · ${formatScore(r.score)} lunas`}
+            data-text={r.headline ? `“${r.headline}”` : r.name}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
+            </svg>
+            <span data-share-label>Compartir</span>
+          </button>
+          <!-- Announces the copy result; a live region inside the button
+               isn't reliably read -->
+          <span class="sr-only" role="status" data-share-status></span>
+        </div>
+        <div class="head-bottom">
+          <div class="title">
+            <span class="eyebrow">{r.city}</span>
+            <h1
+              data-review-name
+              class:list={["flush", { long: r.name.length > 16 }]}
+              style={`--chars: ${longestWord}; view-transition-name: ${vtName("title", review.id)}`}
+            >
+              {r.name}
+            </h1>
+            {r.headline && <p class="headline">“{r.headline}”</p>}
+          </div>
+          {r.score === null ? (
+            <div class="score unscored">
+              <Moon score={0} class="score-moon" />
+              <span class="score-num">
+                <small>Sin puntuar</small>
+              </span>
+            </div>
+          ) : (
+            <div class="score" aria-label={`${formatScore(r.score)} lunas`}>
+              <Moon score={r.score} animated class="score-moon" />
+              <span class="score-num">
+                <RollingScore score={r.score} />
+                <small>
+                  <a href={url("/como-puntuo")} title="Cómo puntúo">
+                    lunas
+                  </a>
+                </small>
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+
+    <dl class="facts" data-review-meta>
+      {r.paid && (
+        <div>
+          <dt>Yo pagué</dt>
+          <dd>{r.paid}</dd>
+        </div>
+      )}
+      {r.avgPrice && (
+        <div>
+          <dt>Precio medio</dt>
+          <dd>{r.avgPrice}</dd>
+        </div>
+      )}
+      {visit && (
+        <div>
+          <dt>Visita</dt>
+          <dd>{visit}</dd>
+        </div>
+      )}
+      {ig && ig.posts.length > 0 && (
+        <div>
+          <dt>En Instagram</dt>
+          <dd>
+            <ul class="links">
+              {ig.posts.map((p, i) => (
+                <li>
+                  <a href={p.url} target="_blank" rel="noopener">
+                    {p.kind === "opinion"
+                      ? "La opinión"
+                      : p.kind === "dishes"
+                        ? "Los platos"
+                        : p.kind === "drinks"
+                          ? "La bebida"
+                          : `Post ${i + 1}`}
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      )}
+      {(ig?.handle || web || onMap) && (
+        <div>
+          <dt>El restaurante</dt>
+          <dd>
+            <ul class="links">
+              {ig?.handle && (
+                <li>
+                  <a
+                    href={`https://www.instagram.com/${ig.handle}/`}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    @{ig.handle}
+                  </a>
+                </li>
+              )}
+              {web && (
+                <li>
+                  <a href={web} target="_blank" rel="noopener">
+                    {new URL(web).hostname.replace(/^www\./, "")}
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                </li>
+              )}
+              {onMap && (
+                <li>
+                  <a href={url(`/mapa?r=${review.id}`)}>Abrir en el mapa</a>
+                </li>
+              )}
+            </ul>
+          </dd>
+        </div>
+      )}
+    </dl>
+
+    <article class="body">
+      {chips.length > 0 && (
+        <ul class="chips" aria-label="Etiquetas">
+          {chips.map((c) => (
+            <li>{c}</li>
+          ))}
+        </ul>
+      )}
+      <div class="text" data-gallery>
+        {r.body.map((block, i) => [
+          block.type === "p" ? (
+            <p data-reveal>{block.text}</p>
+          ) : block.type === "h" ? (
+            <h2 class="update" data-reveal>
+              {block.text}
+            </h2>
+          ) : (
+            <ol class="dishes" data-reveal>
+              {block.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ol>
+          ),
+          after.get(i)?.map((set) => (
+            <div class:list={["moment", set.length > 1 ? "pair" : "single"]}>
+              {set.map((shot) => (
+                <figure>
+                  <button
+                    type="button"
+                    class="photo"
+                    data-wipe
+                    data-full={shot.src}
+                    data-caption={shot.caption ?? ""}
+                    aria-label={`Ampliar foto${shot.caption ? `: ${shot.caption}` : ""}`}
+                  >
+                    <img
+                      src={shot.src}
+                      srcset={srcset(shot.src)}
+                      sizes={
+                        set.length > 1
+                          ? "(max-width: 800px) 50vw, 340px"
+                          : "(max-width: 800px) 100vw, 680px"
+                      }
+                      alt={shot.caption ?? `Foto de ${r.name}`}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </button>
+                  {shot.caption && <figcaption>{shot.caption}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          )),
+        ])}
+      </div>
+    </article>
+
+    {hasSeal && (
+      <aside class="seal-cta">
+        <img
+          src={sealUrl(review.id)}
+          alt=""
+          width="400"
+          height="400"
+          loading="lazy"
+        />
+        <div>
+          <span class="eyebrow">¿Es tu restaurante?</span>
+          <p>Luce tus {formatScore(r.score)} lunas en la puerta y en tu web.</p>
+          <a href={url(`/sello/${review.id}`)}>Consigue el sello →</a>
+        </div>
+      </aside>
+    )}
+
+    {related.length > 0 && (
+      <section class="related" aria-label={`Más en ${r.city}`}>
+        <h2 class="flush" data-chars>Más en {r.city}</h2>
+        <div class="rows">
+          {related.map((o, i) => (
+            <ReviewRow review={o} index={i} photos={o.data.images} />
+          ))}
+        </div>
+      </section>
+    )}
+  </main>
+
+  {hasPhotos && (
+    <dialog class="viewer" data-viewer aria-label="Foto ampliada">
+      <figure>
+        <img alt="" />
+        <figcaption />
+      </figure>
+      <button type="button" class="viewer-close" aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </dialog>
+  )}
+</Layout>
+
+<script>
+  // Share opens the phone's own share sheet; where there is none (most
+  // desktops) it copies the link instead
+  const share = document.querySelector<HTMLButtonElement>("[data-share]")
+  if (share) {
+    const label = share.querySelector("[data-share-label]")!
+    const status = document.querySelector("[data-share-status]")!
+    let reset = 0
+    const say = (text: string) => {
+      label.textContent = status.textContent = text
+      clearTimeout(reset)
+      reset = window.setTimeout(() => {
+        label.textContent = "Compartir"
+        status.textContent = ""
+      }, 2200)
+    }
+    // The site is served over HTTPS, so the clipboard API is always there;
+    // it can still be refused, which shows "No se pudo copiar"
+    const copy = (text: string) =>
+      navigator.clipboard.writeText(text).then(
+        () => true,
+        () => false
+      )
+    share.addEventListener("click", async () => {
+      const data = {
+        title: share.dataset.title,
+        text: share.dataset.text,
+        url: location.href.split("#")[0],
+      }
+      if (navigator.share) {
+        try {
+          await navigator.share(data)
+        } catch {
+          // closed without sharing
+        }
+        return
+      }
+      say((await copy(data.url)) ? "Enlace copiado" : "No se pudo copiar")
+    })
+  }
+
+  // Any photo in the review opens full size; ← → step through them, and a
+  // click anywhere or Esc closes it
+  const viewer = document.querySelector<HTMLDialogElement>("[data-viewer]")
+  if (viewer) {
+    const img = viewer.querySelector("img")!
+    const caption = viewer.querySelector("figcaption")!
+    const photos = [...document.querySelectorAll<HTMLButtonElement>(".photo")]
+    let current = 0
+    const show = (i: number) => {
+      current = (i + photos.length) % photos.length
+      const { full, caption: text } = photos[current]!.dataset
+      img.src = full!
+      img.alt = text ?? ""
+      caption.textContent = text ?? ""
+    }
+    photos.forEach((button, i) =>
+      button.addEventListener("click", () => {
+        show(i)
+        viewer.showModal()
+      })
+    )
+    viewer.addEventListener("click", () => viewer.close())
+    viewer.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") show(current + 1)
+      if (e.key === "ArrowLeft") show(current - 1)
+    })
+    // Back to the photo it opened from
+    viewer.addEventListener("close", () => photos[current]?.focus())
+  }
+</script>
+
+<style>
+  .head {
+    position: relative;
+    height: 100svh;
+    min-height: 600px;
+    background: var(--stage);
+    overflow: hidden;
+  }
+  .media {
+    position: absolute;
+    inset: 0;
+  }
+  .media img,
+  .no-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* No photo: a night sky with the restaurant's moon hanging in it */
+  .no-photo {
+    position: relative;
+    background:
+      radial-gradient(circle at 70% 32%, var(--night), transparent 45%),
+      var(--stage);
+  }
+  .no-photo :global(.no-photo-moon) {
+    position: absolute;
+    top: 14%;
+    left: 62%;
+    width: min(34vmin, 320px);
+    height: auto;
+    opacity: 0.85;
+  }
+  .unscored :global(.score-moon) {
+    --moon-base: transparent;
+    --moon-ring: rgb(255 255 255 / 45%);
+  }
+  .media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgb(0 0 0 / 30%),
+      transparent 30%,
+      rgb(0 0 0 / 70%)
+    );
+  }
+  .head-inner {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 84px 24px 40px;
+    color: #fff;
+  }
+  .back {
+    align-self: flex-start;
+    white-space: nowrap;
+    font: 600 12px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: inherit;
+    text-decoration: none;
+    /* 44px tall to tap without moving anything */
+    padding: 16px 0;
+    margin: -16px 0;
+  }
+  .back:hover {
+    text-decoration: underline;
+  }
+  .head-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .share {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    margin: -12px -12px -12px 0;
+    padding: 0 12px;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: 600 12px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .share svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .share:hover span {
+    text-decoration: underline;
+  }
+  .share:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -4px;
+  }
+  .head-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 32px;
+  }
+  .title {
+    min-width: 0;
+  }
+  .title .eyebrow {
+    color: #fff;
+  }
+  /* Capped so the longest word fits the screen on one line (a letter is
+     about 0.84em wide at this width and weight): names break between words,
+     never inside one */
+  h1 {
+    --size: clamp(56px, 11vw, 200px);
+    margin: 10px 0 0;
+    font: 900 min(var(--size), calc((100vw - 48px) / var(--chars, 1) / 0.9)) /
+      0.82 var(--font-display);
+    font-stretch: 118%;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+    overflow-wrap: break-word;
+  }
+  h1.long {
+    --size: clamp(44px, 7.5vw, 140px);
+  }
+  .headline {
+    margin: 16px 0 0;
+    max-width: 40ch;
+    font: italic 400 clamp(22px, 2.4vw, 34px) / 1.1 var(--font-serif);
+  }
+  .score {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .score :global(.score-moon) {
+    width: clamp(90px, 10vw, 150px);
+    height: auto;
+    --moon-base: rgb(0 0 0 / 45%);
+  }
+  .score-num {
+    font: 800 clamp(64px, 8vw, 130px) / 0.8 var(--font-display);
+    font-stretch: 62%;
+    font-variant-numeric: tabular-nums;
+    color: var(--moon);
+  }
+  .score-num small a {
+    /* inline: the padding only widens the tap area */
+    padding: 16px 0;
+    color: inherit;
+    text-decoration: underline dotted;
+    text-underline-offset: 0.3em;
+  }
+  .score-num small {
+    display: block;
+    margin-top: 6px;
+    font: 700 12px/1 var(--font-display);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px 56px;
+    margin: 0;
+    padding: 28px 24px;
+    background: linear-gradient(135deg, var(--petrol) 0%, var(--band) 100%);
+    color: var(--on-band);
+  }
+  .facts dt {
+    font: 700 11px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--glow);
+  }
+  .facts dd {
+    margin: 8px 0 0;
+    font: 800 clamp(22px, 2.2vw, 32px) / 1.05 var(--font-display);
+    font-stretch: 88%;
+  }
+
+  .body {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(0, 680px) 1fr;
+    gap: 40px;
+    padding: 12vh 24px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .chips {
+    grid-column: 1;
+    align-self: start;
+    position: sticky;
+    top: 90px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .chips li {
+    border: 1.5px solid var(--ink);
+    border-radius: 99px;
+    padding: 6px 11px 5px;
+    font: 700 11px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .text {
+    grid-column: 2;
+    font: 400 clamp(18px, 1.35vw, 21px) / 1.6 var(--font-sans);
+  }
+  .text p {
+    margin: 0 0 1.1em;
+  }
+  .text .update {
+    margin: 2.2em 0 0.9em;
+    padding-top: 1.1em;
+    border-top: 2px solid var(--ink);
+    font: 900 clamp(22px, 2vw, 30px) / 1.05 var(--font-display);
+    font-stretch: 112%;
+    letter-spacing: -0.01em;
+  }
+  /* Alberto's posts and the restaurant's own links, as facts in the band */
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px 8px;
+    border: 2px solid var(--on-band);
+    border-radius: 99px;
+    color: var(--on-band);
+    font: 800 15px/1 var(--font-display);
+    font-stretch: 112%;
+    text-decoration: none;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .links a:hover,
+  .links a:focus-visible {
+    background: var(--on-band);
+    color: var(--band);
+  }
+  .facts :focus-visible {
+    outline-color: var(--on-band);
+  }
+  .text p:first-child::first-letter {
+    float: left;
+    margin: 0.06em 0.08em 0 0;
+    font: 900 4.6em/0.8 var(--font-display);
+    font-stretch: 118%;
+    color: var(--glow-text);
+  }
+  .dishes {
+    margin: 1.4em 0 1.6em;
+    padding: 0;
+    list-style: none;
+    counter-reset: dish;
+    border-top: 2px solid var(--ink);
+  }
+  .dishes li {
+    counter-increment: dish;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .dishes li::before {
+    content: counter(dish, decimal-leading-zero);
+    font: 800 14px/1.9 var(--font-display);
+    color: var(--glow-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .viewer {
+    max-width: none;
+    max-height: none;
+    width: 100vw;
+    height: 100dvh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: zoom-out;
+  }
+  .viewer::backdrop {
+    background: rgb(10 10 12 / 0.88);
+  }
+  .viewer[open] {
+    display: grid;
+    place-items: center;
+    animation: viewer-in 0.25s ease-out;
+  }
+  @keyframes viewer-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .viewer figure {
+    margin: 0;
+    display: grid;
+    gap: 14px;
+    justify-items: center;
+    padding: 16px;
+  }
+  .viewer img {
+    max-width: min(92vw, 1100px);
+    max-height: calc(100dvh - 120px);
+    object-fit: contain;
+    border-radius: 6px;
+  }
+  .viewer figcaption {
+    max-width: 60ch;
+    color: var(--paper);
+    font-size: 15px;
+    text-align: center;
+  }
+  .viewer-close {
+    position: fixed;
+    top: 14px;
+    right: 18px;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    color: var(--paper);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .viewer-close svg {
+    width: 26px;
+    height: 26px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+
+  /* Photos inside the text */
+  .moment {
+    margin: 2.2em 0 2.4em;
+    display: grid;
+    gap: 8px;
+  }
+  .moment.pair {
+    grid-template-columns: 1fr 1fr;
+  }
+  .moment figure {
+    margin: 0;
+  }
+  .photo {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--photo-bg);
+    cursor: zoom-in;
+  }
+  .moment.single .photo {
+    aspect-ratio: 3 / 2;
+  }
+  .moment.pair .photo {
+    aspect-ratio: 4 / 5;
+  }
+  .photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    scale: 1;
+    transition: scale 0.9s cubic-bezier(0.2, 0.7, 0.1, 1);
+  }
+  .photo:hover img {
+    scale: 1.04;
+  }
+  .moment figcaption {
+    margin-top: 10px;
+    font: 600 12px/1.4 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+  /* On a wide screen the single photos reach into the empty right column */
+  @media (min-width: 1200px) {
+    .moment.single {
+      /* Up to the width of that column (text 680px, gaps and padding 128px) */
+      margin-right: calc(-1 * min(340px, (100vw - 808px) / 2));
+    }
+  }
+
+  .seal-cta {
+    display: flex;
+    align-items: center;
+    gap: clamp(20px, 4vw, 48px);
+    padding: 8vh 24px;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .seal-cta img {
+    width: clamp(110px, 14vw, 180px);
+    height: auto;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .seal-cta:hover img {
+    transform: rotate(-10deg);
+  }
+  .seal-cta p {
+    margin: 10px 0 14px;
+    font: 900 clamp(24px, 3vw, 44px) / 0.95 var(--font-display);
+    font-stretch: 112%;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  .seal-cta a {
+    display: inline-block;
+    padding: 16px 0;
+    margin: -16px 0;
+    font: 800 12px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--glow);
+  }
+  .related {
+    padding: 14vh 24px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .related h2 {
+    max-width: 1500px;
+    margin: 0 auto 6vh;
+    font: 900 clamp(48px, 8vw, 130px) / 0.85 var(--font-display);
+    font-stretch: 118%;
+    letter-spacing: -0.04em;
+  }
+  .related .rows {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    .head-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .body {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+    .chips {
+      position: static;
+    }
+    .chips,
+    .text {
+      grid-column: 1;
+    }
+  }
+</style>

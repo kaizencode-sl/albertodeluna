@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); [ \"$(basename \"$f\" 2>/dev/null)\" = new-project.sh ] && shellcheck \"$f\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty'); case \"$f\" in \"$CLAUDE_PROJECT_DIR\"/src/*|\"$CLAUDE_PROJECT_DIR\"/DESIGN.md|\"$CLAUDE_PROJECT_DIR\"/PRODUCT.md|\"$CLAUDE_PROJECT_DIR\"/.impeccable/design.json|\"$CLAUDE_PROJECT_DIR\"/public/favicon.svg) cd \"$CLAUDE_PROJECT_DIR\" && node scripts/check-design.mjs >/dev/null ;; esac",
+            "timeout": 30,
+            "statusMessage": "Checking design rules"
+          }
+        ]
+      }
+    ]
+  }
+}

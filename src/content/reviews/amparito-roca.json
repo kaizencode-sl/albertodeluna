@@ -1,0 +1,122 @@
+{
+  "name": "Amparito Roca",
+  "city": "Madrid",
+  "headline": "Un clásico de Juan Bravo renovado, con gran bodega y terraza",
+  "score": 8.5,
+  "price": "Más de 50€",
+  "plans": [],
+  "venue": [
+    "Clásico",
+    "Con terraza"
+  ],
+  "cuisine": [
+    "De cocina tradicional",
+    "De producto"
+  ],
+  "paid": null,
+  "avgPrice": "80€",
+  "visit": "OCTUBRE 2026",
+  "year": 2026,
+  "month": 10,
+  "address": [],
+  "images": [
+    "/img/ig/amparito-roca-0.webp",
+    "/img/ig/amparito-roca-1.webp",
+    "/img/ig/amparito-roca-2.webp",
+    "/img/ig/amparito-roca-3.webp",
+    "/img/ig/amparito-roca-4.webp",
+    "/img/ig/amparito-roca-5.webp",
+    "/img/ig/amparito-roca-6.webp",
+    "/img/ig/amparito-roca-7.webp",
+    "/img/ig/amparito-roca-8.webp",
+    "/img/ig/amparito-roca-9.webp",
+    "/img/ig/amparito-roca-10.webp",
+    "/img/ig/amparito-roca-11.webp",
+    "/img/ig/amparito-roca-12.webp",
+    "/img/ig/amparito-roca-13.webp",
+    "/img/ig/amparito-roca-14.webp",
+    "/img/ig/amparito-roca-15.webp"
+  ],
+  "excerpt": "Este clásico del bulevar de Juan Bravo cambia de manos y ahora se pone al frente Zoilo (creador de Roostiq).",
+  "body": [
+    {
+      "type": "p",
+      "text": "Este clásico del bulevar de Juan Bravo cambia de manos y ahora se pone al frente Zoilo (creador de Roostiq)."
+    },
+    {
+      "type": "p",
+      "text": "El local se ha reformado por completo, quedando ahora mucho más elegante, bonito y acogedor, con una agradable terraza en pleno bulevar."
+    },
+    {
+      "type": "p",
+      "text": "La propuesta gastronómica mantiene su esencia, con una cocina tradicional y de producto, pero dando un salto en calidad."
+    },
+    {
+      "type": "p",
+      "text": "Y, como era de esperar, la bodega ha crecido exponencialmente, con Borgoña y champán como grandes protagonistas. Además, cuentan con cristalería fina, algo que siempre se agradece."
+    },
+    {
+      "type": "p",
+      "text": "Esta cena fue invitación y, para compartir, probamos lo siguiente, con un nivel general muy bueno y varios platos que me parecieron imprescindibles:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Salpicón de bogavante (imprescindible).",
+        "Garbanzos con langostino y calamar fino (imprescindible).",
+        "Torreznos (imprescindibles).",
+        "Tartar de atún con caviar.",
+        "Tomate Amparito Roca con anchoa.",
+        "Huevos rotos con patata cuadradillo, jamón y pimientos.",
+        "Solomillo a la japonesa.",
+        "Merluza ligeramente hervida en aceite y tostada a la plancha.",
+        "Cocochas de merluza.",
+        "Ajoblanco con crujiente de torrezno, sardina ahumada y sorbete de tempranillo.",
+        "Tarta de queso (imprescindible).",
+        "Hojaldre de manzana templado con helado de vainilla Bourbon y toffe de reineta."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "El ticket medio estará alrededor de los 80€."
+    },
+    {
+      "type": "p",
+      "text": "Abre todos los días excepto domingos."
+    },
+    {
+      "type": "p",
+      "text": "Ya sabéis que cuando una comida es invitación siempre intento valorar la experiencia con cierta perspectiva. Pero lo cierto es que disfrutamos mucho de la cena."
+    },
+    {
+      "type": "p",
+      "text": "Una cocina clásica, reconocible y bien ejecutada, una bodega de mucho nivel y un espacio que, tras la reforma, resulta especialmente agradable."
+    },
+    {
+      "type": "p",
+      "text": "Además, esta nueva etapa acaba de arrancar y estoy convencido de que, a medida que el equipo vaya rodando y ajustando detalles, el restaurante seguirá creciendo."
+    },
+    {
+      "type": "p",
+      "text": "Y esa terraza en pleno bulevar de Juan Bravo es un auténtico plus."
+    },
+    {
+      "type": "p",
+      "text": "8,5 LUNAS. Muy recomendado."
+    }
+  ],
+  "words": 304,
+  "instagram": {
+    "kind": "new",
+    "date": "2026-10-15",
+    "handle": "amparitorocamadrid",
+    "posts": [
+      {
+        "id": "Deg1mvdiHAA",
+        "url": "https://www.instagram.com/alberto_deluna/p/Deg1mvdiHAA/",
+        "date": "2026-10-15",
+        "kind": "opinion"
+      }
+    ]
+  }
+}

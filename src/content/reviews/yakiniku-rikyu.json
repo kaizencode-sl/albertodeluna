@@ -1,0 +1,128 @@
+{
+  "name": "Yakiniku Rikyu",
+  "city": "Madrid",
+  "headline": "Parrilla japonesa de influencia coreana a la que siempre apetece volver",
+  "score": 8,
+  "price": null,
+  "plans": [
+    "Para ir con padres",
+    "Para comida de negocios"
+  ],
+  "venue": [],
+  "cuisine": [
+    "Japonés",
+    "De carnes"
+  ],
+  "paid": null,
+  "avgPrice": null,
+  "visit": "NOVIEMBRE 2026",
+  "year": 2026,
+  "month": 11,
+  "address": [],
+  "images": [
+    "/img/ig/yakiniku-rikyu-1.webp",
+    "/img/ig/yakiniku-rikyu-0.webp",
+    "/img/ig/yakiniku-rikyu-2.webp",
+    "/img/ig/yakiniku-rikyu-3.webp",
+    "/img/ig/yakiniku-rikyu-4.webp",
+    "/img/ig/yakiniku-rikyu-5.webp",
+    "/img/ig/yakiniku-rikyu-6.webp"
+  ],
+  "excerpt": "Es ya una tradición que, cada vez que mis padres vienen a Madrid, vayamos a comer aquí.",
+  "body": [
+    {
+      "type": "p",
+      "text": "Comida para 4."
+    },
+    {
+      "type": "p",
+      "text": "Es ya una tradición que, cada vez que mis padres vienen a Madrid, vayamos a comer aquí."
+    },
+    {
+      "type": "p",
+      "text": "Mis padres siempre se alojan en el One Shot de Fortuny, que está a escasos metros de este restaurante, por lo que es una opción perfecta para disfrutar de una comida tranquila en familia."
+    },
+    {
+      "type": "p",
+      "text": "Se trata de un restaurante japonés de influencia coreana, con mesas que tienen una parrilla en el centro donde cada comensal va cocinando las carnes a su gusto."
+    },
+    {
+      "type": "p",
+      "text": "Es importante preguntar cuánto tiempo debe cocinarse cada corte, ya que el personal no siempre te da las indicaciones necesarias."
+    },
+    {
+      "type": "p",
+      "text": "Distintos cortes de carne que te vas cocinando tú mismo:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Rikyu Karubi (costillar de ternera).",
+        "Toku Johanna Tang (lengua de ternera premium).",
+        "Reba (hígado de ternera).",
+        "Kainomi (mini falda de ternera).",
+        "Wagyu lomo bajo."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "La carne más rica, y también la más cara, es el wagyu, aunque hay otras opciones (lengua, ternera, hígado, presa, etc.) que también merecen la pena."
+    },
+    {
+      "type": "p",
+      "text": "Y además:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Arroz coreano a la piedra con steak tartar y verduras.",
+        "Kimchi tradicional.",
+        "Maceta de chocolate negro."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "A mediodía ofrecen varios menús que funcionan especialmente bien para quienes trabajan por la zona. Y por las noches tienen descuentos del 20% para las reservas más tempranas, sobre las 19:00."
+    },
+    {
+      "type": "p",
+      "text": "El local es amplio, agradable y cuenta con varios reservados, ideales para comidas en grupo."
+    },
+    {
+      "type": "p",
+      "text": "La carta de vinos no tiene especial interés, pero resulta suficiente para el concepto de restaurante."
+    },
+    {
+      "type": "p",
+      "text": "Además, abre todos los días, algo que siempre se agradece."
+    },
+    {
+      "type": "p",
+      "text": "En definitiva, un restaurante cómodo, agradable y con una propuesta que funciona. Sin grandes pretensiones, pero al que siempre apetece volver."
+    },
+    {
+      "type": "p",
+      "text": "8 LUNAS."
+    }
+  ],
+  "words": 283,
+  "instagram": {
+    "kind": "new",
+    "date": "2026-11-10",
+    "handle": "yakinikurikyu",
+    "posts": [
+      {
+        "id": "Dfj5Am4iJXY",
+        "url": "https://www.instagram.com/alberto_deluna/p/Dfj5Am4iJXY/",
+        "date": "2026-11-10",
+        "kind": "opinion"
+      },
+      {
+        "id": "DfjyJ_ICM89",
+        "url": "https://www.instagram.com/alberto_deluna/p/DfjyJ_ICM89/",
+        "date": "2026-11-10",
+        "kind": "dishes"
+      }
+    ]
+  }
+}

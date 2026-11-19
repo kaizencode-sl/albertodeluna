@@ -1,0 +1,159 @@
+{
+  "name": "Agarimo",
+  "city": "Madrid",
+  "headline": "Cocina gallega de autor en su mejor momento a la que se le ha quedado pequeño el local",
+  "score": 9,
+  "price": "Más de 50€",
+  "plans": [],
+  "venue": [],
+  "cuisine": [
+    "De autor",
+    "De pescados"
+  ],
+  "paid": null,
+  "avgPrice": "50-60€",
+  "visit": "OCTUBRE 2026",
+  "year": 2026,
+  "month": 10,
+  "address": [],
+  "images": [
+    "/img/ig/agarimo-3.webp",
+    "/img/ig/agarimo-1.webp",
+    "/img/ig/agarimo-2.webp",
+    "/img/ig/agarimo-4.webp",
+    "/img/ig/agarimo-5.webp",
+    "/img/ig/agarimo-6.webp",
+    "/img/ig/agarimo-7.webp",
+    "/img/ig/agarimo-8.webp",
+    "/img/ig/agarimo-9.webp"
+  ],
+  "excerpt": "Son ya muchas las visitas a este pequeño restaurante de cocina gallega con un toque de autor, y esta ha sido la mejor de todas.",
+  "body": [
+    {
+      "type": "p",
+      "text": "Cena para 2, yendo muy fuerte."
+    },
+    {
+      "type": "p",
+      "text": "Son ya muchas las visitas a este pequeño restaurante de cocina gallega con un toque de autor, y esta ha sido la mejor de todas."
+    },
+    {
+      "type": "p",
+      "text": "¡En qué gran momento está Guille Rivera!"
+    },
+    {
+      "type": "p",
+      "text": "Os enseño todo lo que comimos:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Carne asada y pimientos en su emulsión."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Es de matrícula de honor cómo trabaja los pescados Guille. Prueba de ello estos dos platos, con su icónica merluza y una fantástica lubina:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Merluza a la gallega 2.0.",
+        "Lubina de Aquanaria bilbaína y ajo negro."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Y además:"
+    },
+    {
+      "type": "list",
+      "items": [
+        "Croqueta de cocido gallego y emulsión de grelo.",
+        "Navajas con escabeche templado.",
+        "Berberechos, marinera de Jerez y judías.",
+        "Rape curado y salpicón emulsionado.",
+        "Molleja asada, coliflor y anguila ahumada.",
+        "Tarta de queso y chocolate de Salvaje."
+      ]
+    },
+    {
+      "type": "p",
+      "text": "Carta de vinos exclusivamente nacional y con el foco puesto en Galicia."
+    },
+    {
+      "type": "p",
+      "text": "Nosotros optamos por Algueira Risco (Ribeira Sacra) y Valbuxan de Telmo Rodríguez. Tintos de perfil ligero que me gustaron mucho."
+    },
+    {
+      "type": "p",
+      "text": "Y, por fin, tras mucho tiempo reclamándolo, ¡¡han incorporado cristalería!!"
+    },
+    {
+      "type": "p",
+      "text": "Si sois de cerveza, probad su Estrella Galicia."
+    },
+    {
+      "type": "p",
+      "text": "Mi pregunta es, ¿y ahora qué?"
+    },
+    {
+      "type": "p",
+      "text": "Y es que creo que la cocina de Guille ha llegado a un nivel que merece dar un salto."
+    },
+    {
+      "type": "p",
+      "text": "El local actual es muy modesto y, en mi opinión, se le ha quedado pequeño a una cocina que tiene muchísimo más recorrido."
+    },
+    {
+      "type": "p",
+      "text": "Me imagino este mismo Agarimo en un local más cool, con una barra donde poder ver cocinar a Guille, mesas altas, mucho ambiente y un poco de jaleo. Y creo que lo reventaría."
+    },
+    {
+      "type": "p",
+      "text": "Porque esta cocina tiene personalidad, es divertida, está muy rica y gusta muchísimo."
+    },
+    {
+      "type": "p",
+      "text": "Creo que ha llegado el momento de dar ese paso y llevar Agarimo al siguiente nivel."
+    },
+    {
+      "type": "p",
+      "text": "Mientras tanto, podemos seguir disfrutando de esta magnífica cocina, que además apuesta por el aprovechamiento del producto y el desperdicio cero."
+    },
+    {
+      "type": "p",
+      "text": "Ticket medio de 50-60€."
+    },
+    {
+      "type": "p",
+      "text": "9 LUNAS. Totalmente recomendable."
+    }
+  ],
+  "words": 323,
+  "instagram": {
+    "kind": "new",
+    "date": "2026-10-26",
+    "handle": "agarimomadrid",
+    "posts": [
+      {
+        "id": "De9KvXoCL5U",
+        "url": "https://www.instagram.com/alberto_deluna/p/De9KvXoCL5U/",
+        "date": "2026-10-26",
+        "kind": "opinion"
+      },
+      {
+        "id": "De9HvddCMoO",
+        "url": "https://www.instagram.com/alberto_deluna/p/De9HvddCMoO/",
+        "date": "2026-10-26",
+        "kind": "dishes"
+      },
+      {
+        "id": "De9JYEViPK_",
+        "url": "https://www.instagram.com/alberto_deluna/p/De9JYEViPK_/",
+        "date": "2026-10-26",
+        "kind": "drinks"
+      }
+    ]
+  }
+}
