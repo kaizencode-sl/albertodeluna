@@ -2,6 +2,7 @@
 import Layout from "@/layouts/main.astro"
 import { breadcrumbs } from "@/lib/seo"
 import Moon from "@/components/moon.astro"
+import DualRange from "@/components/dual-range.astro"
 import {
   getReviews,
   reviewUrl,
@@ -15,7 +16,43 @@ import {
 const reviews = await getReviews()
 const cities = tally(reviews, (r) => r.data.city)
 const plans = tally(reviews, (r) => r.data.plans)
+// Price bands from cheapest to dearest (as the reviews store them), what
+// each stop of the price slider is called, and how a from–to pick reads
 const PRICES = ["Menos de 50€", "Más de 50€", "Más de 100€"]
+const PRICE_STOPS = ["Menos de 50€", "50–100€", "Más de 100€"]
+const PRICE_RANGES = {
+  "0-0": "Menos de 50€",
+  "1-1": "50–100€",
+  "2-2": "Más de 100€",
+  "0-1": "Hasta 100€",
+  "1-2": "Más de 50€",
+  "0-2": "Todos",
+}
+
+// Real searches that find something, typed into the empty search box one
+// after another so it reads as a search: restaurant names, the cuisines he
+// tags ("De pescados" → "pescados") and cities, interleaved
+const interleave = (...lists: string[][]) =>
+  Array.from({ length: Math.max(...lists.map((l) => l.length)) }, (_, i) =>
+    lists.map((l) => l[i])
+  )
+    .flat()
+    .filter((x): x is string => Boolean(x))
+const searchExamples = [
+  ...new Set(
+    interleave(
+      reviews.map((r) => r.data.name),
+      [
+        ...new Set(
+          reviews.flatMap((r) =>
+            r.data.cuisine.map((c) => c.replace(/^De /, "").toLowerCase())
+          )
+        ),
+      ],
+      cities.map(([c]) => c)
+    )
+  ),
+].slice(0, 8)
 
 const fold = (s: string) =>
   s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase()
@@ -37,7 +74,6 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     ].join(" ")
   )
 }
-
 ---
 
 <Layout
@@ -51,7 +87,9 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
   <main class="page">
     <header class="top">
       <span class="eyebrow">El archivo · {reviews.length} reseñas</span>
-      <h1 class="flush" data-chars>Elige <span class="o">mesa</span></h1>
+      <h1 class="flush" data-chars>
+        Elige <span class="o">mesa</span>
+      </h1>
       <label class="search">
         <span class="sr-only">Buscar restaurante, plato o zona</span>
         <input
@@ -59,6 +97,7 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
           data-q
           placeholder="Busca un sitio, un plato, un barrio…"
           data-placeholder-short="Sitio, plato o barrio…"
+          data-examples={JSON.stringify(searchExamples)}
           autocomplete="off"
           spellcheck="false"
         />
@@ -81,7 +120,7 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
           </select>
         </div>
 
-        <fieldset class="group">
+        <fieldset class="group" data-plan-group>
           <legend class="label">Plan</legend>
           <div class="chips">
             {plans.map(([p]) => (
@@ -97,39 +136,36 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
           </div>
         </fieldset>
 
+        {/* Two handles on one track: from and to */}
         <fieldset class="group">
-          <legend class="label">Precio</legend>
-          <div class="chips">
-            {PRICES.map((p) => (
-              <button
-                type="button"
-                class="chip"
-                data-price={p}
-                aria-pressed="false"
-              >
-                {p}
-              </button>
-            ))}
+          <legend class="label">
+            Precio <output data-price-out>Todos</output>
+          </legend>
+          <DualRange
+            name="price"
+            min={0}
+            max={PRICES.length - 1}
+            step={1}
+            label="Precio"
+            data-stops={JSON.stringify(PRICE_STOPS)}
+            data-ranges={JSON.stringify(PRICE_RANGES)}
+          />
+          <div class="ticks" aria-hidden="true">
+            <span>&lt;50€</span>
+            <span>50–100€</span>
+            <span>&gt;100€</span>
           </div>
         </fieldset>
 
-        <div class="group">
-          <label class="label" for="min">
-            Lunas mínimas <output data-min-out>0</output>
-          </label>
+        <fieldset class="group">
+          <legend class="label">
+            Lunas <output data-score-out>0–10</output>
+          </legend>
           <div class="range">
             <Moon score={0} class="range-moon" />
-            <input
-              id="min"
-              type="range"
-              min="0"
-              max="10"
-              step="0.5"
-              value="0"
-              data-min
-            />
+            <DualRange name="score" min={0} max={10} step={0.5} label="Lunas" />
           </div>
-        </div>
+        </fieldset>
 
         <div class="group">
           <label class="label" for="sort">
@@ -137,8 +173,9 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
           </label>
           <select id="sort" data-sort>
             <option value="recent">Más recientes</option>
+            <option value="oldest">Menos recientes</option>
             <option value="score">Más lunas</option>
-            <option value="name">A–Z</option>
+            <option value="score-asc">Menos lunas</option>
           </select>
         </div>
 
@@ -163,13 +200,14 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
                 data-text={searchText(review)}
                 data-city={r.city}
                 data-plans={r.plans.join("|")}
-                data-price={r.price ?? ""}
+                data-price={r.price ? PRICES.indexOf(r.price) : -1}
                 data-score={r.score ?? -1}
-                data-name={fold(r.name)}
                 hidden={i >= 36}
               >
                 <a href={reviewUrl(review.id)} data-cursor="Leer">
-                  <figure style={`view-transition-name: ${vtName("photo", review.id)}`}>
+                  <figure
+                    style={`view-transition-name: ${vtName("photo", review.id)}; view-transition-class: photo`}
+                  >
                     {src ? (
                       <img
                         src={src}
@@ -193,7 +231,9 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
                     {r.city}
                     {r.year && ` · ${r.year}`}
                   </span>
-                  <h2 style={`view-transition-name: ${vtName("title", review.id)}`}>
+                  <h2
+                    style={`view-transition-name: ${vtName("title", review.id)}`}
+                  >
                     {r.name}
                   </h2>
                   <p>{r.headline}</p>
@@ -221,6 +261,7 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
   import { gsap } from "gsap"
   import { ScrollTrigger } from "gsap/ScrollTrigger"
   import { moonPath } from "@/lib/moon"
+  import { dualRange } from "@/lib/dual-range"
 
   const PAGE = 36
   // Reduced motion skips the animation; gsap.matchMedia() keeps it current
@@ -242,56 +283,174 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     (q.placeholder = narrow.matches ? q.dataset.placeholderShort! : longHint)
   setHint()
   narrow.addEventListener("change", setHint)
+
+  // While the box is empty and not focused, real searches type themselves
+  // into the placeholder ("Busca japonés|"), so it reads as a search box.
+  // Focus, a typed query or reduced motion bring back the plain hint.
+  const examples: string[] = JSON.parse(q.dataset.examples ?? "[]")
+  let typingTimer = 0
+  const idle = () => !reduce && !q.value && document.activeElement !== q
+  let word = 0
+  let typed = 0
+  let deleting = false
+  let blinks = 0
+  const show = (text: string, caret: boolean) =>
+    (q.placeholder = `Busca ${text}${caret ? "|" : ""}`)
+  function typeTick() {
+    if (!idle()) return setHint()
+    const target = examples[word % examples.length]!
+    let wait = 60
+    if (!deleting && typed < target.length) {
+      typed++
+      show(target.slice(0, typed), true)
+      wait = 70 + Math.random() * 70
+    } else if (!deleting && blinks < 5) {
+      // Hold the whole word with a blinking caret
+      blinks++
+      show(target, blinks % 2 === 1)
+      wait = 420
+    } else if (typed > 0) {
+      deleting = true
+      typed--
+      show(target.slice(0, typed), true)
+      wait = 35
+    } else {
+      deleting = false
+      blinks = 0
+      word++
+      wait = 400
+    }
+    typingTimer = window.setTimeout(typeTick, wait)
+  }
+  function startTyping() {
+    clearTimeout(typingTimer)
+    if (examples.length && idle())
+      typingTimer = window.setTimeout(typeTick, 700)
+  }
+  q.addEventListener("focus", () => {
+    clearTimeout(typingTimer)
+    setHint()
+  })
+  q.addEventListener("blur", startTyping)
+  startTyping()
   const city = document.querySelector<HTMLSelectElement>("[data-city]")!
   const sort = document.querySelector<HTMLSelectElement>("[data-sort]")!
-  const min = document.querySelector<HTMLInputElement>("[data-min]")!
-  const minOut = document.querySelector<HTMLOutputElement>("[data-min-out]")!
+  const scoreOut =
+    document.querySelector<HTMLOutputElement>("[data-score-out]")!
   const rangeMoon = document.querySelector<SVGPathElement>(".range [data-moon]")
   const countOut = document.querySelector<HTMLElement>("[data-count-out]")!
   const none = document.querySelector<HTMLElement>("[data-none]")!
   const more = document.querySelector<HTMLButtonElement>("[data-more]")!
   const planBtns = [
-    ...document.querySelectorAll<HTMLButtonElement>("[data-plan]"),
+    ...document.querySelectorAll<HTMLButtonElement>("button[data-plan]"),
   ]
-  const priceBtns = [
-    ...document.querySelectorAll<HTMLButtonElement>("[data-price]"),
-  ]
+  const priceOut =
+    document.querySelector<HTMLOutputElement>("[data-price-out]")!
+
+  const priceEl = document.querySelector<HTMLElement>('[data-dual="price"]')!
+  const priceStops: string[] = JSON.parse(priceEl.dataset.stops!)
+  const priceRanges: Record<string, string> = JSON.parse(
+    priceEl.dataset.ranges!
+  )
+  const price = dualRange(
+    priceEl,
+    (lo, hi) => {
+      priceOut.textContent = priceRanges[`${lo}-${hi}`] ?? ""
+      const [a, b] = priceEl.querySelectorAll("input")
+      a!.setAttribute("aria-valuetext", priceStops[lo]!)
+      b!.setAttribute("aria-valuetext", priceStops[hi]!)
+    },
+    update
+  )
+  const comma = (v: number) => String(v).replace(".", ",")
+  const score = dualRange(
+    document.querySelector<HTMLElement>('[data-dual="score"]')!,
+    (lo, hi) => {
+      scoreOut.textContent = `${comma(lo)}–${comma(hi)}`
+      rangeMoon?.setAttribute("d", moonPath(lo / 10))
+      const [a, b] = document.querySelectorAll('[data-dual="score"] input')
+      a!.setAttribute("aria-valuetext", `${comma(lo)} lunas`)
+      b!.setAttribute("aria-valuetext", `${comma(hi)} lunas`)
+    },
+    update
+  )
+  const planGroup = document.querySelector<HTMLElement>("[data-plan-group]")!
 
   let shown = PAGE
   let matches: HTMLElement[] = []
 
-  const pressed = (btns: HTMLButtonElement[], key: "plan" | "price") =>
+  const pressed = (btns: HTMLButtonElement[], key: "plan") =>
     btns
       .filter((b) => b.getAttribute("aria-pressed") === "true")
       .map((b) => b.dataset[key]!)
 
-  function compute() {
+  /** Whether a card passes every filter, optionally ignoring one of them */
+  function passes(c: HTMLElement, skip?: "city") {
+    const d = c.dataset
     const words = fold(q.value).split(/\s+/).filter(Boolean)
     const wantPlans = pressed(planBtns, "plan")
-    const wantPrices = pressed(priceBtns, "price")
-    const minScore = Number(min.value)
-    matches = cards.filter((c) => {
-      const d = c.dataset
-      if (words.some((w) => !d.text!.includes(w))) return false
-      if (city.value && d.city !== city.value) return false
-      if (
-        wantPlans.length &&
-        !wantPlans.every((p) => d.plans!.split("|").includes(p))
-      )
-        return false
-      if (wantPrices.length && !wantPrices.includes(d.price!)) return false
-      if (minScore > 0 && Number(d.score) < minScore) return false
-      return true
-    })
-    const by = sort.value
-    matches.sort((a, b) =>
-      by === "score"
-        ? Number(b.dataset.score) - Number(a.dataset.score) ||
-          Number(a.dataset.i) - Number(b.dataset.i)
-        : by === "name"
-          ? a.dataset.name!.localeCompare(b.dataset.name!)
-          : Number(a.dataset.i) - Number(b.dataset.i)
+    if (words.some((w) => !d.text!.includes(w))) return false
+    if (skip !== "city" && city.value && d.city !== city.value) return false
+    if (
+      wantPlans.length &&
+      !wantPlans.every((p) => d.plans!.split("|").includes(p))
     )
+      return false
+    // With a narrower range, a review without a price or a score (-1) can't
+    // be said to fall inside it
+    const inside = (v: number, r: typeof price) =>
+      r.full() || (v >= r.lo() && v <= r.hi())
+    if (!inside(Number(d.price), price)) return false
+    if (!inside(Number(d.score), score)) return false
+    return true
+  }
+
+  // Filters refine each other: a plan or city that would leave no results
+  // with the rest of the filters is taken out of the list (the ones already
+  // on stay, so they can be turned off). Plans add up (a review must have
+  // them all), so a plan stays if some current result has it; cities are
+  // alternatives, so they are checked ignoring the chosen one.
+  function refine() {
+    const has = (b: HTMLButtonElement, ok: boolean) =>
+      (b.hidden = !ok && b.getAttribute("aria-pressed") !== "true")
+    planBtns.forEach((b) =>
+      has(
+        b,
+        matches.some((c) =>
+          c.dataset.plans!.split("|").includes(b.dataset.plan!)
+        )
+      )
+    )
+    planGroup.hidden = planBtns.every((b) => b.hidden)
+    const byCity = cards.filter((c) => passes(c, "city"))
+    for (const o of city.options) {
+      if (!o.value) continue
+      const n = byCity.filter((c) => c.dataset.city === o.value).length
+      o.textContent = `${o.value} (${n})`
+      o.hidden = n === 0 && o.value !== city.value
+    }
+  }
+
+  function compute() {
+    matches = cards.filter((c) => passes(c))
+    // Cards come newest first (data-i); ties in score keep that order, and
+    // reviews without a score (-1) go last either way
+    const by = sort.value
+    const age = (a: HTMLElement, b: HTMLElement) =>
+      Number(a.dataset.i) - Number(b.dataset.i)
+    const score = (c: HTMLElement) => Number(c.dataset.score)
+    matches.sort((a, b) => {
+      if (by === "oldest") return age(b, a)
+      if (by === "score") return score(b) - score(a) || age(a, b)
+      if (by === "score-asc")
+        return (
+          Number(score(a) < 0) - Number(score(b) < 0) ||
+          score(a) - score(b) ||
+          age(a, b)
+        )
+      return age(a, b)
+    })
+    refine()
   }
 
   function render(animate = true) {
@@ -334,12 +493,6 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     history.replaceState(null, "", qs ? `?${qs}` : location.pathname)
   }
 
-  function paintMoon() {
-    const v = Number(min.value)
-    minOut.textContent = v ? String(v).replace(".", ",") : "0"
-    rangeMoon?.setAttribute("d", moonPath(v / 10))
-  }
-
   let typing: number | undefined
   q.addEventListener("input", () => {
     clearTimeout(typing)
@@ -347,9 +500,7 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
   })
   city.addEventListener("change", update)
   sort.addEventListener("change", update)
-  min.addEventListener("input", paintMoon)
-  min.addEventListener("change", update)
-  ;[...planBtns, ...priceBtns].forEach((b) =>
+  planBtns.forEach((b) =>
     b.addEventListener("click", () => {
       b.setAttribute(
         "aria-pressed",
@@ -362,13 +513,12 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     b.addEventListener("click", () => {
       q.value = ""
       city.value = ""
-      min.value = "0"
       sort.value = "recent"
-      ;[...planBtns, ...priceBtns].forEach((x) =>
-        x.setAttribute("aria-pressed", "false")
-      )
-      paintMoon()
+      price.reset()
+      score.reset()
+      planBtns.forEach((x) => x.setAttribute("aria-pressed", "false"))
       update()
+      startTyping()
     })
   )
   more.addEventListener("click", () => {
@@ -387,7 +537,6 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
   const params = new URLSearchParams(location.search)
   q.value = params.get("q") ?? ""
   if (params.get("ciudad")) city.value = params.get("ciudad")!
-  paintMoon()
   compute()
   render(false)
 </script>
@@ -438,7 +587,6 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     width: 100%;
     background: transparent;
     border: 0;
-    border-bottom: 3px solid var(--on-band);
     padding: 10px 0 14px;
     font: 800 clamp(26px, 4vw, 56px) / 1 var(--font-display);
     font-stretch: 88%;
@@ -449,10 +597,16 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
   .search input::placeholder {
     color: color-mix(in srgb, var(--on-band) 55%, transparent);
   }
-  /* The global Burnt Gold ring is too faint on gold: ink instead */
+  /* No focus box on the search or the selects: the search shows focus with
+     a sky-glow caret and a brighter placeholder, the selects turn blue */
+  .search input {
+    caret-color: var(--glow);
+  }
   .search input:focus-visible {
-    outline: 2px solid var(--on-band);
-    outline-offset: 6px;
+    outline: none;
+  }
+  .search input:focus::placeholder {
+    color: color-mix(in srgb, var(--on-band) 80%, transparent);
   }
 
   .layout {
@@ -486,6 +640,10 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
+  /* A legend shrinks to its text: full width so the value sits on the right */
+  legend.label {
+    width: 100%;
+  }
   .label output {
     color: var(--glow-text);
   }
@@ -496,11 +654,110 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%230e0d0c'/%3E%3C/svg%3E")
       no-repeat right 4px center / 10px;
     border: 0;
-    border-bottom: 2px solid var(--ink);
     padding: 8px 20px 8px 0;
     font: 600 17px/1.2 var(--font-display);
     color: var(--ink);
     border-radius: 0;
+  }
+  select:focus-visible {
+    outline: none;
+    color: var(--glow-text);
+  }
+  /* Customizable select where supported (Chrome, Edge, Safari 27): the
+     picker is a card-paper panel with stamped options, the chosen one a
+     royal-blue pill like the active filters. Elsewhere it stays the plain
+     select above with the native list. */
+  @supports (appearance: base-select) {
+    select,
+    select::picker(select) {
+      appearance: base-select;
+    }
+    select {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: transparent;
+      padding: 8px 0;
+      cursor: pointer;
+    }
+    select::picker-icon {
+      color: var(--ink);
+      transition: rotate 0.3s cubic-bezier(0.2, 0.7, 0.1, 1);
+    }
+    select:open::picker-icon {
+      rotate: 180deg;
+    }
+    select::picker(select) {
+      min-width: anchor-size(width);
+      margin-top: 8px;
+      padding: 8px;
+      border: 2px solid var(--petrol);
+      border-radius: 18px;
+      background: var(--card-surface);
+      color: var(--ink);
+      /* Floats over the page: the overlay shadow from DESIGN.md */
+      box-shadow: 0 18px 40px rgb(0 0 0 / 35%);
+      opacity: 0;
+      translate: 0 -6px;
+      transition:
+        display 0.25s,
+        overlay 0.25s,
+        opacity 0.25s cubic-bezier(0.2, 0.7, 0.1, 1),
+        translate 0.25s cubic-bezier(0.2, 0.7, 0.1, 1);
+      transition-behavior: allow-discrete;
+    }
+    select:open::picker(select) {
+      opacity: 1;
+      translate: 0 0;
+    }
+    @starting-style {
+      select:open::picker(select) {
+        opacity: 0;
+        translate: 0 -6px;
+      }
+    }
+    option {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 99px;
+      font: 600 17px/1.2 var(--font-display);
+      cursor: pointer;
+      transition:
+        color 0.2s,
+        translate 0.2s;
+    }
+    /* The chosen option's dot, like the active filters ("● Con amigos");
+       the checkmark only exists inside the open list */
+    option::checkmark {
+      content: "●";
+      font-size: 0.8em;
+    }
+    option:not(:checked)::checkmark {
+      display: none;
+    }
+    option:hover,
+    option:focus-visible {
+      outline: none;
+      background: transparent;
+      color: var(--band);
+      translate: 4px 0;
+    }
+    option:checked {
+      background: var(--band);
+      color: var(--on-band);
+      font-weight: 800;
+      translate: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    select::picker(select),
+    select::picker-icon,
+    option {
+      transition: none;
+    }
   }
   .chips {
     display: flex;
@@ -536,6 +793,16 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     background: var(--band);
     border-color: var(--band);
     color: var(--on-band);
+  }
+  /* Where the price slider's three stops are */
+  .ticks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: -6px;
+    font: 700 11px/1 var(--font-display);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
   }
   .range {
     display: flex;
@@ -589,6 +856,10 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     padding: 0;
     list-style: none;
   }
+  .chip[hidden],
+  .group[hidden] {
+    display: none;
+  }
   .card[hidden] {
     display: none;
   }
@@ -619,7 +890,11 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     place-items: center;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 50% 45%, var(--sky-halo) 0%, var(--petrol) 100%);
+    background: radial-gradient(
+      circle at 50% 45%,
+      var(--sky-halo) 0%,
+      var(--petrol) 100%
+    );
   }
   .placeholder :global(.ph-moon) {
     width: 46%;

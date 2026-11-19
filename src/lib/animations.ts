@@ -10,7 +10,6 @@ gsap.registerPlugin(ScrollTrigger, SplitText)
 // Seconds scrubbed animations take to catch up with the scroll: this lag, on
 // top of Lenis, is what makes them glide instead of following every tick
 const SCRUB = 1.1
-const INTRO_KEY = "luna:intro-seen"
 // Plays on the way in and stays. Not `once: true`: a trigger that kills itself
 // while ScrollTrigger is refreshing its list breaks the refresh loop.
 const PLAY_ONCE = "play none none none"
@@ -44,119 +43,54 @@ function smoothScroll() {
   return { lenis, stop }
 }
 
-function seenIntro() {
-  try {
-    return sessionStorage.getItem(INTRO_KEY) === "1"
-  } catch {
-    return false
-  }
-}
-function markIntro() {
-  try {
-    sessionStorage.setItem(INTRO_KEY, "1")
-  } catch {
-    /* private mode: the intro just plays again */
-  }
-}
-
-// The homepage opening: a moon waxes from new to full while the counter runs
-// to the number of reviews, LUNA stamps onto it, and the full moon becomes the
-// window the hero photo opens through. On a second visit in the same session
-// only the opening plays. Scrolling then shrinks the photo back into a moon.
-const SKIP_EVENTS = ["wheel", "touchstart", "keydown", "pointerdown"] as const
-
-function intro(lenis: Lenis) {
-  const loader = $("[data-loader]")
+// The homepage opening: the hero photo opens from a point to the whole
+// screen, its edge traced by a ring of light as it spreads, and LUNA rises
+// whole from the bottom edge. Scrolling then shrinks the photo back into a
+// moon.
+function intro() {
   const hero = $("[data-hero]")
   const media = $("[data-hero-media]")
+  const ring = $("[data-hero-ring]")
   if (!hero || !media) return
-  // Radii in px: the loader moon, a circle that covers the screen, and the
-  // moon the photo becomes on scroll
-  const moonR = () =>
-    ($(".loader-moon")?.getBoundingClientRect().width ??
-      Math.min(innerWidth, innerHeight) * 0.46) / 2
+  // Radii in px: a circle that covers the screen, and the moon the photo
+  // becomes on scroll
   const fullR = () => Math.hypot(innerWidth, innerHeight) / 2 + 2
   const endR = () => Math.min(innerWidth, innerHeight) * 0.3
   const circle = (r: number, y = 50) => `circle(${r}px at 50% ${y}%)`
 
-  const tl = gsap.timeline({
-    defaults: { ease: "power3.out" },
-    onComplete: () => {
-      lenis.start()
-      markIntro()
-    },
-  })
-  if (loader && !seenIntro()) {
-    lenis.stop()
-    // Scroll stays locked while it plays, so any attempt to move on (wheel,
-    // touch, a key, a click) jumps straight to the end
-    const skip = () => {
-      tl.progress(1)
-      for (const type of SKIP_EVENTS) removeEventListener(type, skip)
-    }
-    for (const type of SKIP_EVENTS)
-      addEventListener(type, skip, { passive: true, signal })
-    const disc = $$<SVGPathElement>(".loader-disc [data-moon]", loader)
-    const counter = $("[data-count]", loader)
-    const total = Number(counter?.dataset.count ?? 0)
-    const phase = { v: 0 }
-    gsap.set(media, { clipPath: circle(moonR()) })
-    tl.to(phase, {
-      v: 1,
-      duration: 1.6,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        disc.forEach((p) => p.setAttribute("d", moonPath(phase.v)))
-        if (counter)
-          counter.textContent = String(Math.round(phase.v * total)).padStart(
-            3,
-            "0"
-          )
-      },
-    })
-      .to(
-        "[data-loader-stamp]",
-        { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" },
-        "-=.2"
-      )
-      .to("[data-loader-stamp]", {
-        x: "+=6",
-        duration: 0.05,
-        repeat: 5,
-        yoyo: true,
-        ease: "none",
-      })
-      // Same night, same stars: fading the loader leaves the moon as a photo
-      .to(loader, { opacity: 0, duration: 0.7, ease: "power2.inOut" }, "+=.25")
-      .set(loader, { display: "none" })
-      .to(
-        media,
-        { clipPath: circle(fullR()), duration: 1.4, ease: "expo.inOut" },
-        "-=.1"
-      )
-  } else {
-    if (loader) loader.style.display = "none"
-    gsap.set(media, { clipPath: circle(0) })
-    tl.to(media, {
-      clipPath: circle(fullR()),
-      duration: 1.4,
-      ease: "expo.inOut",
-    })
-  }
+  // The photo opens from a point to the whole screen, with the ring of light
+  // riding its edge and fading as it reaches the corners
+  const opening = { duration: 1.5, ease: "expo.inOut" }
+  const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
+  tl.fromTo(
+    media,
+    { clipPath: circle(0) },
+    { clipPath: circle(fullR()), ...opening },
+    0
+  )
+  if (ring)
+    tl.fromTo(
+      ring,
+      { width: 0, height: 0, opacity: 1 },
+      { width: fullR() * 2, height: fullR() * 2, opacity: 0, ...opening },
+      0
+    )
   tl.to(
     "[data-hero-frame]",
-    { scale: 1.05, duration: 2.2, ease: "expo.out" },
-    "<"
+    { scale: 1.05, duration: 2.4, ease: "expo.out" },
+    0
   )
-    .from(
-      "[data-hero-word] .char",
-      { yPercent: 110, duration: 1.1, stagger: 0.08, ease: "expo.out" },
-      "-=1.0"
+    .to(
+      // Hidden below the edge by .motion; the word rises as one block
+      "[data-hero-word] span",
+      { y: 0, duration: 1.6, ease: "expo.out" },
+      0.75
     )
-    .from(
+    .to(
+      // Hidden by .motion, so they never flash in before they arrive
       "[data-hero-meta] > *",
-      { y: 24, opacity: 0, duration: 0.8, stagger: 0.1 },
-      "-=.8"
+      { y: 0, opacity: 1, duration: 1, stagger: 0.12, ease: "expo.out" },
+      1.05
     )
 
   // Then the scroll takes over: the word grows and lifts, the photo closes
@@ -602,25 +536,17 @@ function reviewHead() {
   const hasScore = head.dataset.score !== ""
   const target = Number(head.dataset.score ?? 0)
   const state = { v: 0 }
+  // The photo and name arrive whole: the view transition from the card
+  // already opens them, so a reveal here would fight it
   const tl = gsap.timeline({ defaults: { ease: "expo.out" } })
-  tl.fromTo(
-    "[data-review-media]",
-    { clipPath: "circle(16% at 50% 50%)" },
-    { clipPath: "circle(75% at 50% 50%)", duration: 1.4, ease: "expo.inOut" }
-  )
-  const photo = $("[data-review-media] img", head)
-  if (photo) tl.from(photo, { scale: 1.35, duration: 2 }, "<")
-  tl.from(
-    SplitText.create("[data-review-name]", { type: "words,chars" }).chars,
-    { yPercent: 110, duration: 1, stagger: 0.03 },
-    "-=1.1"
-  )
-    .from(
-      "[data-review-meta] > *",
-      { y: 20, opacity: 0, duration: 0.7, stagger: 0.08, ease: "power3.out" },
-      "-=.8"
-    )
-    .addLabel("moon", "-=.9")
+  tl.from("[data-review-meta] > *", {
+    y: 20,
+    opacity: 0,
+    duration: 0.7,
+    stagger: 0.08,
+    ease: "power3.out",
+  })
+    .addLabel("moon", 0.3)
     .to(
       state,
       {
@@ -684,7 +610,6 @@ function cursor() {
 
 // Show the end states the animations would have reached
 function endStates() {
-  $("[data-loader]")?.style.setProperty("display", "none")
   $$("[data-moon-scrub]").forEach((s) =>
     $("[data-moon]", s)?.setAttribute("d", moonPath(1))
   )
@@ -717,9 +642,9 @@ export function initMotion() {
       root.classList.add("motion")
       const listeners = new AbortController()
       signal = listeners.signal
-      const { lenis, stop } = smoothScroll()
+      const { stop } = smoothScroll()
       progressMoon()
-      intro(lenis)
+      intro()
       reviewHead()
       words()
       moonScrub()

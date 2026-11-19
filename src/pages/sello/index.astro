@@ -117,17 +117,22 @@ const sealed = (await getReviews())
     margin-top: 40px;
     padding: 14px 0;
     border: 0;
-    border-bottom: 2px solid var(--paper);
     background: transparent;
     color: inherit;
     font: 700 clamp(20px, 2vw, 26px) / 1 var(--font-display);
-    outline: none;
   }
   .search input::placeholder {
     color: var(--grey);
   }
-  .search input:focus {
-    border-color: var(--glow);
+  /* No focus box: a sky-glow caret and a brighter placeholder show focus */
+  .search input {
+    caret-color: var(--glow);
+  }
+  .search input:focus-visible {
+    outline: none;
+  }
+  .search input:focus::placeholder {
+    color: var(--paper);
   }
   .grid {
     display: grid;

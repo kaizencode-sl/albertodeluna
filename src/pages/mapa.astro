@@ -4,6 +4,8 @@ import "maplibre-gl/dist/maplibre-gl.css"
 import "@/styles/moon-map.css"
 import { breadcrumbs } from "@/lib/seo"
 import { getPins, type Pin } from "@/lib/pins"
+import Moon from "@/components/moon.astro"
+import DualRange from "@/components/dual-range.astro"
 
 const pins = await getPins()
 
@@ -48,16 +50,16 @@ const SPAIN = "-9.6,35.8,4.4,43.9"
         <br /> en lunas
       </h1>
 
-      <label class="min">
-        <span class="min-head">
-          <svg viewBox="-110 -110 220 220" aria-hidden="true">
-            <circle r="100"></circle>
-            <path d="" data-min-moon></path>
-          </svg>
-          Desde <strong data-min-label>0</strong> lunas
-        </span>
-        <input type="range" min="0" max="10" step="0.5" value="0" data-min />
-      </label>
+      {/* Same filter as the review list: a from–to range of lunas */}
+      <fieldset class="group">
+        <legend class="label">
+          Lunas <output data-score-out>0–10</output>
+        </legend>
+        <div class="range">
+          <Moon score={0} class="range-moon" />
+          <DualRange name="score" min={0} max={10} step={0.5} label="Lunas" />
+        </div>
+      </fieldset>
 
       <div class="jumps" role="group" aria-label="Ir a">
         <button type="button" data-fly={SPAIN}>
@@ -132,39 +134,42 @@ const SPAIN = "-9.6,35.8,4.4,43.9"
     color: var(--glow);
     font-variant-numeric: tabular-nums;
   }
-  .min {
-    display: grid;
-    gap: 12px;
-    margin-top: 22px;
+  /* The review list's filters (restaurantes/index.astro), on the night:
+     sky glow where the list uses deep royal */
+  .group {
+    margin: 22px 0 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
   }
-  .min-head {
+  .label {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    font: 700 12px/1 var(--font-display);
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 0;
+    font: 800 12px/1 var(--font-display);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
   }
-  .min-head svg {
-    width: 20px;
-    height: 20px;
-    overflow: visible;
-  }
-  .min-head circle {
-    fill: var(--night);
-    stroke: var(--glow);
-    stroke-width: 10;
-  }
-  .min-head path {
-    fill: var(--moon);
-  }
-  .min strong {
+  .label output {
     color: var(--glow);
   }
-  .min input {
-    width: 100%;
-    height: 44px;
-    accent-color: var(--glow);
+  .range {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    --dual-track: var(--dim);
+    --dual-fill: var(--glow);
+    --dual-ring: var(--ink);
+  }
+  .range :global(.range-moon) {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    --moon-base: var(--night);
+    --moon-ring: var(--dim);
+    --moon-lit: var(--moon);
   }
   .jumps {
     display: flex;
@@ -177,33 +182,34 @@ const SPAIN = "-9.6,35.8,4.4,43.9"
     display: inline-flex;
     gap: 6px;
     align-items: baseline;
-    border: 1.5px solid color-mix(in srgb, var(--paper) 30%, transparent);
+    border: 1.5px solid currentColor;
     border-radius: 99px;
-    padding: 7px 11px 6px;
+    padding: 7px 12px 6px;
     background: transparent;
     color: inherit;
-    font: 700 11px/1 var(--font-display);
+    font: 700 12px/1 var(--font-display);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     transition:
-      background 0.2s,
+      color 0.2s,
       border-color 0.2s,
-      color 0.2s;
+      opacity 0.25s ease;
   }
   .jumps small {
     font-size: 11px;
     color: var(--grey);
   }
-  .jumps button:hover,
-  .jumps .near {
-    border-color: var(--glow);
-  }
   .jumps button:hover {
-    background: var(--glow);
-    color: var(--on-glow);
+    border-color: var(--glow);
+    color: var(--glow);
   }
   .jumps button:hover small {
     color: inherit;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .jumps:has(button:hover) button:not(:hover) {
+      opacity: 0.45;
+    }
   }
   .noscript {
     position: absolute;

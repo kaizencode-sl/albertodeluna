@@ -9,6 +9,7 @@ import {
 // Vite pre-bundles MapLibre away from its worker file, so point at it directly
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url"
 import { moonPath } from "@/lib/moon"
+import { dualRange } from "@/lib/dual-range"
 
 import type { Pin } from "@/lib/pins"
 import { url } from "@/lib/url"
@@ -216,10 +217,10 @@ export function moonMap(
   map.touchZoomRotate.disableRotation()
   map.addControl(new NavigationControl({ showCompass: false }), "bottom-right")
 
-  const toFeatures = (min: number) => ({
+  const toFeatures = (lo: number, hi: number) => ({
     type: "FeatureCollection" as const,
     features: pins
-      .filter((p) => p.score >= min)
+      .filter((p) => p.score >= lo && p.score <= hi)
       .map((p) => ({
         type: "Feature" as const,
         geometry: { type: "Point" as const, coordinates: [p.lon, p.lat] },
@@ -248,7 +249,7 @@ export function moonMap(
     addMoonIcons(map, pal)
     map.addSource("pins", {
       type: "geojson",
-      data: toFeatures(0),
+      data: toFeatures(0, 10),
       cluster: true,
       clusterRadius: 44,
       clusterMaxZoom: 13,
@@ -337,22 +338,32 @@ export function moonMap(
     map.on("mouseleave", layer, () => (map.getCanvas().style.cursor = ""))
   }
 
-  // Minimum lunas
-  const range = root.querySelector<HTMLInputElement>("[data-min]")
-  const minLabel = root.querySelector<HTMLElement>("[data-min-label]")
+  // A range of lunas, filtered live as the handles move
+  const scoreEl = root.querySelector<HTMLElement>('[data-dual="score"]')
+  const scoreOut = root.querySelector<HTMLElement>("[data-score-out]")
   const count = root.querySelector<HTMLElement>("[data-count]")
-  const minMoon = root.querySelector<SVGPathElement>("[data-min-moon]")
-  const applyMin = () => {
-    const min = Number(range?.value ?? 0)
-    const data = toFeatures(min)
-    if (minLabel) minLabel.textContent = String(min).replace(".", ",")
-    if (count) count.textContent = String(data.features.length)
-    minMoon?.setAttribute("d", moonPath(min / 10))
-    map.getSource<GeoJSONSource>("pins")?.setData(data)
-    popup.remove()
+  const rangeMoon = root.querySelector<SVGPathElement>(
+    ".range-moon [data-moon]"
+  )
+  const comma = (v: number) => String(v).replace(".", ",")
+  if (scoreEl) {
+    const range = dualRange(scoreEl, (lo, hi) => {
+      const data = toFeatures(lo, hi)
+      if (scoreOut) scoreOut.textContent = `${comma(lo)}–${comma(hi)}`
+      if (count) count.textContent = String(data.features.length)
+      rangeMoon?.setAttribute("d", moonPath(lo / 10))
+      const [a, b] = scoreEl.querySelectorAll("input")
+      a?.setAttribute("aria-valuetext", `${comma(lo)} lunas`)
+      b?.setAttribute("aria-valuetext", `${comma(hi)} lunas`)
+      map.getSource<GeoJSONSource>("pins")?.setData(data)
+      popup.remove()
+    })
+    map.on("load", () =>
+      map
+        .getSource<GeoJSONSource>("pins")
+        ?.setData(toFeatures(range.lo(), range.hi()))
+    )
   }
-  range?.addEventListener("input", applyMin)
-  if (range) map.on("load", applyMin)
 
   // /mapa?r=<id> opens on that restaurant
   const start =

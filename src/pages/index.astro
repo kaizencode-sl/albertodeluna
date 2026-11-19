@@ -78,21 +78,6 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
 ---
 
 <Layout jsonLd={homeGraph()}>
-  <div class="loader" data-loader aria-hidden="true">
-    <Stars seed={11} />
-    <div class="loader-moon">
-      <Moon score={0} animated class="loader-disc" />
-      <div class="loader-stamp" data-loader-stamp>
-        LUNA
-      </div>
-    </div>
-    <div class="loader-count">
-      <span data-count={reviews.length}>000</span>
-      <small>restaurantes puntuados</small>
-    </div>
-    <div class="loader-who">por Alberto de Luna</div>
-  </div>
-
   <main>
     <section class="hero" data-hero aria-label="Portada">
       <div class="hero-stage">
@@ -115,6 +100,8 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
             ></video>
           </div>
         </div>
+        {/* The moon's edge, traced in light as the photo opens */}
+        <div class="hero-ring" data-hero-ring aria-hidden="true"></div>
         <div class="hero-meta" data-hero-meta>
           <p>La vida es demasiado corta como para no disfrutarla comiendo.</p>
           <div class="kv">
@@ -129,11 +116,7 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
           <span>Baja</span>
         </span>
         <h1 class="hero-word" data-hero-word aria-label="Alberto de Luna">
-          {[..."LUNA"].map((c) => (
-            <span class="char" aria-hidden="true">
-              {c}
-            </span>
-          ))}
+          <span aria-hidden="true">LUNA</span>
         </h1>
       </div>
     </section>
@@ -153,7 +136,12 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
       <div class="manifesto-foot">
         <span class="sig">
           Alberto de Luna,{" "}
-          <a href={INSTAGRAM} target="_blank" rel="noopener" data-cursor="Seguir">
+          <a
+            href={INSTAGRAM}
+            target="_blank"
+            rel="noopener"
+            data-cursor="Seguir"
+          >
             151.000 seguidores en Instagram
           </a>
         </span>
@@ -171,11 +159,13 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
       </svg>
     </section>
 
-    <section class="lunas" data-moon-scrub aria-label="Cómo puntúa">
+    <section class="lunas" data-moon-scrub aria-label="Cómo puntúo">
       <Stars seed={3} count={80} class="lunas-stars" />
       <div class="lunas-stage">
         <div class="lunas-left">
-          <span class="eyebrow">Cómo puntúa</span>
+          <a class="eyebrow lunas-link" href={url("/como-puntuo")}>
+            Cómo puntúo →
+          </a>
           <h2 class="flush">
             En lunas,
             <br />
@@ -209,7 +199,9 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
       <section class="latest" aria-labelledby="latest-title">
         <div class="latest-head">
           <span class="eyebrow">Recién salidas de Instagram</span>
-          <h2 class="flush" id="latest-title">Últimas reseñas</h2>
+          <h2 class="flush" id="latest-title">
+            Últimas reseñas
+          </h2>
         </div>
         <ol class="latest-list">
           {latest.map((review) => {
@@ -221,7 +213,7 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
                   {r.images[0] && (
                     <span
                       class="card-photo"
-                      style={`view-transition-name: ${vtName("photo", review.id)}`}
+                      style={`view-transition-name: ${vtName("photo", review.id)}; view-transition-class: photo`}
                     >
                       <img
                         src={r.images[0]}
@@ -273,22 +265,38 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
           i % 2 ? <span>{c}</span> : <span class="o">{c}</span>
         )}
       </div>
-      <span class="sticker-wrap" data-depth="1.2" style="left:12%;top:16%;z-index:4">
+      <span
+        class="sticker-wrap"
+        data-depth="1.2"
+        style="left:12%;top:16%;z-index:4"
+      >
         <span class="sticker" data-drop="-12">
           Para primera cita
         </span>
       </span>
-      <span class="sticker-wrap" data-depth="-0.9" style="left:58%;top:44%;z-index:3">
+      <span
+        class="sticker-wrap"
+        data-depth="-0.9"
+        style="left:58%;top:44%;z-index:3"
+      >
         <span class="sticker" data-drop="8">
           Para ir con padres
         </span>
       </span>
-      <span class="sticker-wrap" data-depth="0.85" style="left:30%;top:70%;z-index:4">
+      <span
+        class="sticker-wrap"
+        data-depth="0.85"
+        style="left:30%;top:70%;z-index:4"
+      >
         <span class="sticker" data-drop="-5">
           Para cenar tarde
         </span>
       </span>
-      <span class="sticker-wrap" data-depth="-1.15" style="left:78%;top:12%;z-index:3">
+      <span
+        class="sticker-wrap"
+        data-depth="-1.15"
+        style="left:78%;top:12%;z-index:3"
+      >
         <span class="sticker" data-drop="14">
           De barra
         </span>
@@ -301,7 +309,9 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
 
     <section class="reviews" aria-label="Reseñas">
       <div class="reviews-head">
-        <h2 class="flush" data-chars>Madrid</h2>
+        <h2 class="flush" data-chars>
+          Madrid
+        </h2>
         <p>
           Algunas de sus notas más altas.{" "}
           <a href={url("/restaurantes")}>
@@ -463,67 +473,6 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
 </script>
 
 <style>
-  /* Loader: only when the animations run and the intro hasn't played this session */
-  .loader {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    background: var(--stage);
-    display: none;
-    place-items: center;
-    color: var(--on-stage);
-  }
-  :global(.motion:not(.intro-seen)) .loader {
-    display: grid;
-  }
-  /* The moon waxes with the counter, then becomes the window onto the hero photo */
-  .loader-moon {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: var(--moon-size);
-    height: var(--moon-size);
-  }
-  .loader-moon :global(.loader-disc) {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-  .loader-stamp {
-    position: relative;
-    color: var(--ink);
-    font: 900 clamp(40px, 8vmin, 110px) / 1 var(--font-display);
-    font-stretch: 125%;
-    letter-spacing: 0.02em;
-    border: 0.06em solid currentColor;
-    padding: 0.08em 0.22em 0.02em;
-    transform: rotate(-6deg) scale(1.6);
-    opacity: 0;
-  }
-  .loader-count {
-    position: absolute;
-    left: 24px;
-    bottom: 20px;
-    font: 800 clamp(40px, 7vw, 96px) / 1 var(--font-display);
-    font-stretch: 62%;
-    font-variant-numeric: tabular-nums;
-  }
-  .loader-count small {
-    display: block;
-    font: 600 12px/1.2 var(--font-display);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-top: 6px;
-  }
-  .loader-who {
-    position: absolute;
-    right: 24px;
-    bottom: 24px;
-    font: italic 400 clamp(18px, 2.2vw, 28px) / 1.1 var(--font-serif);
-    text-align: right;
-  }
-
   /* Hero */
   .hero {
     position: relative;
@@ -565,6 +514,24 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
   .hero-frame video.is-playing {
     opacity: 1;
   }
+  /* A thin sky-glow circle on the edge of the opening photo; sized and faded
+     by the timeline */
+  .hero-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    translate: -50% -50%;
+    border: 1.5px solid var(--glow);
+    border-radius: 50%;
+    box-shadow:
+      0 0 24px color-mix(in srgb, var(--glow) 45%, transparent),
+      inset 0 0 24px color-mix(in srgb, var(--glow) 25%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
   .hero-media::after {
     content: "";
     position: absolute;
@@ -598,9 +565,26 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
     z-index: 2;
     pointer-events: none;
   }
-  .hero-word .char {
+  /* LUNA rises whole from below the screen's edge, like a moonrise; the
+     span moves so the scroll can keep moving the heading itself */
+  .hero-word span {
     display: inline-block;
-    will-change: transform;
+  }
+  :global(.motion) .hero-word span {
+    transform: translateY(105%);
+  }
+  :global(.motion) [data-hero-meta] > * {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .lunas-link {
+    width: fit-content;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+  .lunas-link:hover {
+    color: var(--moon);
   }
   .hero-meta {
     position: absolute;
@@ -859,8 +843,12 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
   .lunas {
     position: relative;
     height: 340svh;
-    background:
-      radial-gradient(circle at 72% 50%, var(--sky-halo) 0%, var(--sky-deep) 44%, var(--ink) 100%);
+    background: radial-gradient(
+      circle at 72% 50%,
+      var(--sky-halo) 0%,
+      var(--sky-deep) 44%,
+      var(--ink) 100%
+    );
   }
   .lunas-stage {
     position: sticky;
@@ -1111,14 +1099,8 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
   .rows :global([hidden]) {
     display: none;
   }
-  .rows :global([data-row]) {
-    transition: opacity 0.35s cubic-bezier(0.19, 1, 0.22, 1);
-  }
   @media (hover: hover) and (pointer: fine) {
     .filters:has(.fbtn:hover) .fbtn:not(:hover, [aria-pressed="true"]) {
-      opacity: 0.45;
-    }
-    .rows:has(:global([data-row]:hover)) :global([data-row]:not(:hover)) {
       opacity: 0.45;
     }
   }

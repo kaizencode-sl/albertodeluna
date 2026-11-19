@@ -1,0 +1,122 @@
+---
+/**
+ * A from–to slider: two native range inputs stacked on one track, so each
+ * handle keeps its own label and keyboard control. `dualRange()` in
+ * `@/lib/dual-range` wires it up (handles that can't cross, the filled
+ * stretch). Themed only through --dual-track, --dual-fill and --dual-ring
+ * (the colour behind the handles), paper by default.
+ */
+import type { HTMLAttributes } from "astro/types"
+
+interface Props extends HTMLAttributes<"div"> {
+  /** Found again with [data-dual="<name>"] */
+  name: string
+  min: number
+  max: number
+  step: number
+  /** What is being picked, for the handles' labels ("Lunas desde/hasta") */
+  label: string
+}
+
+const { name, min, max, step, label, class: className, ...rest } = Astro.props
+---
+
+<div class:list={["dual", className]} data-dual={name} {...rest}>
+  <input
+    type="range"
+    min={min}
+    max={max}
+    step={step}
+    value={min}
+    aria-label={`${label} desde`}
+    data-lo
+  />
+  <input
+    type="range"
+    min={min}
+    max={max}
+    step={step}
+    value={max}
+    aria-label={`${label} hasta`}
+    data-hi
+  />
+</div>
+
+<style>
+  /* A track, the picked stretch filled, two round handles. Only the handles
+     take the pointer, so either can be dragged. */
+  .dual {
+    --thumb: 20px;
+    position: relative;
+    flex: 1;
+    height: 44px;
+  }
+  .dual::before,
+  .dual::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    height: 4px;
+    translate: 0 -50%;
+    border-radius: 99px;
+    pointer-events: none;
+  }
+  .dual::before {
+    left: calc(var(--thumb) / 2);
+    right: calc(var(--thumb) / 2);
+    background: var(--dual-track, var(--photo-bg));
+  }
+  .dual::after {
+    left: calc(var(--thumb) / 2 + (100% - var(--thumb)) * var(--from, 0));
+    right: calc(var(--thumb) / 2 + (100% - var(--thumb)) * (1 - var(--to, 1)));
+    background: var(--dual-fill, var(--glow-text));
+  }
+  input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    appearance: none;
+    background: transparent;
+    pointer-events: none;
+  }
+  input:focus-visible {
+    outline: none;
+  }
+  input::-webkit-slider-runnable-track {
+    height: 100%;
+    background: transparent;
+  }
+  input::-moz-range-track {
+    background: transparent;
+  }
+  input::-webkit-slider-thumb {
+    appearance: none;
+    pointer-events: auto;
+    cursor: grab;
+    width: var(--thumb);
+    height: var(--thumb);
+    margin-top: calc((44px - var(--thumb)) / 2);
+    border: 3px solid var(--dual-ring, var(--paper));
+    border-radius: 50%;
+    background: var(--dual-fill, var(--glow-text));
+  }
+  input::-moz-range-thumb {
+    pointer-events: auto;
+    cursor: grab;
+    width: var(--thumb);
+    height: var(--thumb);
+    border: 3px solid var(--dual-ring, var(--paper));
+    border-radius: 50%;
+    background: var(--dual-fill, var(--glow-text));
+  }
+  input:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--dual-fill, var(--glow-text));
+    outline-offset: 2px;
+  }
+  input:focus-visible::-moz-range-thumb {
+    outline: 2px solid var(--dual-fill, var(--glow-text));
+    outline-offset: 2px;
+  }
+</style>

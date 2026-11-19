@@ -42,7 +42,7 @@ const tags = [...r.plans.map(shortPlan), ...r.venue].slice(0, 2)
         data-wipe
         style={
           sharedTransition && i === 0
-            ? `view-transition-name: ${vtName("photo", review.id)}`
+            ? `view-transition-name: ${vtName("photo", review.id)}; view-transition-class: photo`
             : undefined
         }
       >

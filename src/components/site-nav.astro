@@ -131,7 +131,7 @@ import SwapLabel from "@/components/swap-label.astro"
   addEventListener("resize", queue)
   // a photo arriving under the nav changes it too (load doesn't bubble)
   document.addEventListener("load", queue, true)
-  // intros and loaders change what's under the nav without any scrolling
+  // intros change what's under the nav without any scrolling
   for (const ms of [0, 400, 1200, 2500, 4500]) setTimeout(queue, ms)
 </script>
 
@@ -213,10 +213,6 @@ import SwapLabel from "@/components/swap-label.astro"
     /* 44px tall to tap, same footprint as before */
     padding: 16px 0;
     margin: -10px 0;
-  }
-  .link:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
   }
   @media (max-width: 640px) {
     .nav {

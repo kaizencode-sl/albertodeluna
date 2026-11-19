@@ -29,7 +29,7 @@ One named critic with a personal scale, not an aggregator. Alberto scores the fo
 ## Capabilities and Constraints
 
 - Static Astro site; content is one collection, a JSON file per review (`src/content/reviews/<id>.json`), with name, city, headline, score (may be null), price band, plans, venue and cuisine tags, what he paid, visit date, address, images, body and Instagram links.
-- Pages: home, the full review list with filters, a page per review, a map of scored restaurants ("Mapa de lunas"), "Cómo puntúo" (the scale and who he is), and the restaurant seal finder and download pages.
+- Pages: home, the full review list with filters that refine each other (a plan or city that would leave no results is hidden), from–to sliders for price band and lunas, and sorting by date or lunas either way, a page per review, a map of scored restaurants ("Mapa de lunas"), "Cómo puntúo" (the scale and who he is), and the restaurant seal finder and download pages.
 - Old WordPress addresses redirect to the new pages (`src/data/redirects.json`, guarded by `pnpm check:redirects`); the site is in Spanish.
 - Undecided: when it replaces the live site, and anything Alberto has not yet seen or approved.
 

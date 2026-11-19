@@ -96,11 +96,51 @@ const ld = jsonLd ? JSON.stringify(jsonLd).replaceAll("<", "\\u003c") : null
       // Hidden start states only apply when the animations will run
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         document.documentElement.classList.add("motion")
-        try {
-          if (sessionStorage.getItem("luna:intro-seen") === "1")
-            document.documentElement.classList.add("intro-seen")
-        } catch {}
       }
+      // Opening or closing a review: only that review's photo and name keep
+      // their shared view-transition names, so the other cards on either
+      // page stay with the page instead of flying around on their own (with
+      // no review involved, none keep them). The navigation also gets the
+      // "review" type (global.css).
+      const reviewId = (u) =>
+        u && new URL(u).pathname.match(/\/restaurantes\/([^/]+)\/?$/)?.[1]
+      const keepOnly = (id) => {
+        const names = [`vt-photo-${id}`, `vt-title-${id}`]
+        for (const el of document.querySelectorAll(
+          "[style*='view-transition-name'], [data-vt]"
+        )) {
+          // Remember the name from the markup: a page restored from the
+          // back/forward cache may be left from a previous navigation
+          el.dataset.vt ??= el.style.viewTransitionName
+          el.style.viewTransitionName = names.includes(el.dataset.vt)
+            ? el.dataset.vt
+            : "none"
+        }
+      }
+      addEventListener("pageswap", (e) => {
+        if (!e.viewTransition) return
+        const id = reviewId(e.activation?.entry?.url) || reviewId(location.href)
+        keepOnly(id)
+      })
+      addEventListener("pagereveal", (e) => {
+        const activation = window.navigation?.activation
+        const from = reviewId(activation?.from?.url)
+        // Arriving from a review by a link ("← Todas las reseñas") rather
+        // than the back button: open the list at that review's card, which
+        // the back button already does on its own
+        if (
+          from &&
+          !reviewId(location.href) &&
+          activation.navigationType !== "traverse"
+        )
+          document
+            .querySelector(`[style*="vt-photo-${from};"]`)
+            ?.scrollIntoView({ block: "center" })
+        if (!e.viewTransition) return
+        const id = reviewId(location.href) || from
+        keepOnly(id)
+        if (id) e.viewTransition.types.add("review")
+      })
     </script>
   </head>
   <body>

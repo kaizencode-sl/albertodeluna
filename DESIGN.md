@@ -170,7 +170,7 @@ components:
 
 **Creative North Star: "Under One Moon"**
 
-Alberto de Luna's surname and his scores are moons, so the whole site lives under one. Every page is a night scene: black ink and deep petrol, moonlight paper and Alberto's blues, a royal cobalt for surfaces and a luminous sky blue for light. A score is not a number in a badge, it is the phase of a moon, and that moon recurs as the loader, the nav's progress mark, the score stamp, the footer's phase strip and the map pins. If a new screen has no moon in it somewhere, it is probably off-brand.
+Alberto de Luna's surname and his scores are moons, so the whole site lives under one. Every page is a night scene: black ink and deep petrol, moonlight paper and Alberto's blues, a royal cobalt for surfaces and a luminous sky blue for light. A score is not a number in a badge, it is the phase of a moon, and that moon recurs as the window the hero photo opens through, the nav's progress mark, the score stamp, the footer's phase strip and the map pins. If a new screen has no moon in it somewhere, it is probably off-brand.
 
 The voice is a late-night food column set as a poster: huge, wide, black-weight Archivo headlines that run edge to edge, answered by Instrument Serif italics that sound like the critic talking under his breath. Photos come first and fill their frames. The scroll is the narrator: sections pin, words light up, moons wax and numbers roll as you go. There is one visual world and no light/dark switch; sections alternate between night (ink) and paper, with royal blue bands reserved for the loudest moments.
 
@@ -194,7 +194,7 @@ A night palette in Alberto's blues: ink and petrol for the dark, cream paper for
 - **Deep Royal** (#0b4d82, `--glow-text` and `--band-deep`): blue for text and outlines on paper, where sky glow would vanish. Eyebrows, links on hover, the score label on cards, the focus ring (7.1:1 on paper); as `--band-deep` it fills the hero word.
 
 ### Neutral
-- **Night Ink** (#0a0a0a, `--ink`): page background, the stage behind the loader and photo heroes, text on paper.
+- **Night Ink** (#0a0a0a, `--ink`): page background, the stage behind the photo heroes, text on paper.
 - **Petrol** (#02303c, `--petrol`): the dark blue that carries the brand on paper: card outlines, the inverted card on hover, the end of the blue gradients, sticker and CTA text, the unlit body of card moons.
 - **Night** (#071e26, `--night`): the unlit body of a moon on ink.
 - **Sky Halo** (#09354a) and **Sky Deep** (#041923) (`--sky-halo`, `--sky-deep`): only for the radial night sky behind the big moons (the lunas scene and "Cómo puntúo").
@@ -276,6 +276,10 @@ Stamped and outlined: controls read like ink stamps on a menu, outlined in 2px, 
 - **Pill CTA** (`.map-open`): white fill, petrol text, 900 13px wide (112%) uppercase, 0.06em, 14px 20px padding, full pill. Hover: `scale(1.05) rotate(-2deg)`.
 - **Text filters** (`.fbtn`): unstyled 600 17px Archivo in Slate; hover goes royal blue and nudges 4px right; `aria-pressed="true"` becomes a royal-blue pill with white 800 text and a "●" prefix.
 - **Links**: inherit colour, 1px underline at 0.18em offset; hover to deep royal or royal blue on paper, sky glow or full moon on ink.
+- **Selects** (the list's Ciudad and Orden): no border or underline, 600 17px Archivo in ink with a small ink arrow; focus turns the text deep royal instead of drawing a box. Where the customizable select is supported (`appearance: base-select`, behind `@supports`), the open list is a card-paper panel with a 2px petrol outline, 18px corners and the overlay shadow, fading in 6px from above; options are 600 17px pills that hover to royal blue and nudge 4px right, and the chosen one is a royal-blue pill with white 800 text and a "●" (drawn as `option::checkmark`, so it never shows in the closed select). Other browsers keep the native list.
+- **From–to sliders** (`dual-range.astro` + `dualRange()` in `src/lib/dual-range.ts`; the list's Precio and Lunas, the map's Lunas): two native range inputs stacked on one track, so each handle keeps its own label and keyboard control and they can't cross. A 4px track, the picked stretch filled, 20px handles with a 3px ring of the background; keyboard focus rings the handle instead of boxing the input. Themed only through `--dual-track`, `--dual-fill` and `--dual-ring`: Photo Sand, deep royal and paper on paper (the default), Deep Slate, sky glow and ink on the map's night panel. The pick reads on the right of the label ("50–100€", "8–9") in deep royal on paper, sky glow on ink, with a 34px moon at the lower end beside the lunas slider; price stops are labelled below in the micro style. A review without a price or score only shows while the whole track is picked.
+- **Filter chips** (the list's Plan, the map's "Ir a"): 700 12px uppercase pills with a 1.5px outline in the text colour; hover turns text and outline blue (deep royal on paper, sky glow on ink) and dims the other chips to 45%; a chosen chip on the list is a royal-blue pill with white text.
+- **Search fields**: no border or underline and no focus box; focus shows as a sky-glow caret and a brighter placeholder. With no frame to say "search", the list's search box types real searches into its placeholder while it is empty and unfocused ("Busca japonés|": restaurant names, cuisines and cities from the archive, each one with results), holding each with a blinking caret before deleting it; focus, a query or reduced motion bring back the plain hint, and the field's hidden label keeps its accessible name steady.
 
 ### Score Stamp
 The score as a stamp: a 22px white moon at the score's phase plus "7,5 lunas", 900 15px uppercase, white on a royal-blue pill with a matching 2px border, 6px 14px 6px 8px.
@@ -289,6 +293,12 @@ The score as a stamp: a 22px white moon at the score's phase plus "7,5 lunas", 9
 
 ### Review Row
 The list's unit: a 2px ink rule, a tabular index, the uppercase wide name with its serif quote under it, the score stamp on the right, then a four-photo strip and an uppercase meta footer. Hover scales the photos to 1.07 over 0.9s on `cubic-bezier(0.2, 0.7, 0.1, 1)`. A custom cursor grows to a 110px sky-glow disc saying "Ver reseña".
+
+### Home Opening
+There is no loader: the page opens straight on the hero. Under the night sky the photo opens from a point to the whole screen (1.5s `expo.inOut`) with a 1.5px sky-glow ring riding the circle's edge and fading by the corners, the photo settling from 1.25 to 1.05 scale; then LUNA rises whole from below the bottom edge (never letter by letter) and the tagline and counts follow. Scrolling never waits for it, and reduced motion gets the finished page.
+
+### Opening a Review
+A card, row or list photo opens its review through a cross-document view transition: its photo and name share `view-transition-name`s with the review hero (every card carries them in its markup, but a script in `main.astro` strips them on `pageswap`/`pagereveal` from everything except the review being opened or closed, so the other cards move with their page). Coming back from a review by a link rather than the back button opens the list or home page centred on that review's card, so the photo always has a card to shrink back into, and the photos carry `view-transition-class: photo` so they keep their proportions (`object-fit: cover`) while the frame grows. Navigations to or from a review get the `review` type (set on `pagereveal` in `main.astro`): 0.9s on `cubic-bezier(0.76, 0, 0.24, 1)`, the old page sinks into ink (fade + scale 0.94), the photo grows into the hero, and the new page settles in around it after 0.5s. The review hero has no load animation of its own (no clip reveal, no letter split), so nothing fights the transition; only the moon and the rolling score play.
 
 ### Review Photos
 One format inside a review's text column: a single 3:2 photo or a pair of 4:5 photos, 6px corners, alternating as the text runs. Dish lists are plain numbered text; the photos of their dishes follow the list as a set captioned in the uppercase label style. Every photo is a button that opens the same full-screen viewer (← → step through all of them, Esc or a click closes). There is no separate gallery at the end.

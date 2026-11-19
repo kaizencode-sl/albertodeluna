@@ -52,7 +52,7 @@
   --top-title: var(--on-band);
   --top-outline-fill: transparent;
   --top-stroke: clamp(1.4px, 0.015em, 2.5px) var(--glow);
-  /* Behind the loader and the photo heroes */
+  /* Behind the photo heroes */
   --stage: var(--ink);
   --on-stage: var(--moon);
   /* Supporting tones */
@@ -63,9 +63,6 @@
   /* Hairlines and the default outline colour */
   --border: color-mix(in srgb, var(--ink) 14%, transparent);
   --ring: var(--glow-text);
-
-  /* The loader moon and the window the hero photo opens through */
-  --moon-size: min(46vmin, 420px);
 
   color-scheme: dark;
 }
@@ -200,6 +197,47 @@ html.lenis body {
 }
 ::view-transition-image-pair(*) {
   isolation: isolate;
+}
+/* Opening a review (or closing it back): the card's photo grows into the
+   hero over a page that sinks into the night, then the new page settles in
+   around it. The "review" type is set in main.astro on pagereveal. */
+html:active-view-transition-type(review) {
+  &::view-transition-group(*),
+  &::view-transition-old(*),
+  &::view-transition-new(*) {
+    animation-duration: 0.9s;
+    animation-timing-function: cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  /* Photos keep their proportions while the frame changes shape */
+  &::view-transition-old(*.photo),
+  &::view-transition-new(*.photo) {
+    height: 100%;
+    object-fit: cover;
+  }
+  &::view-transition-group(root) {
+    background: var(--ink);
+  }
+  /* Other cards that only exist on one side go with the page, not on
+     their own */
+  &::view-transition-old(root),
+  &::view-transition-old(*):only-child {
+    animation: vt-sink 0.5s cubic-bezier(0.4, 0, 1, 1) both;
+  }
+  &::view-transition-new(root),
+  &::view-transition-new(*):only-child {
+    animation: vt-settle 0.5s 0.5s cubic-bezier(0, 0, 0.2, 1) both;
+  }
+}
+@keyframes vt-sink {
+  to {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+@keyframes vt-settle {
+  from {
+    opacity: 0;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*),
