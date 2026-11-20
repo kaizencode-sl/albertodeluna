@@ -126,7 +126,7 @@ function sealBody(
   ${STARS.map(([x, y, r, o]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${t.text}" fill-opacity="${o}"/>`).join("")}
   <g transform="translate(${C} ${moonY})">
     <circle r="${moonR}" fill="${t.base}"/>
-    <path d="${moonPath(score / 10, moonR)}" fill="${t.lit}"/>
+    <path d="${moonPath(score / 10, moonR)}" fill="${t.lit}" data-moon data-r="${moonR}"/>
   </g>
   ${type.line(scoreText, x0, 270, { ...big, fill: t.text })}
   ${type.line("lunas", x0 + w1 + gap, 270, { ...small, fill: t.accent })}

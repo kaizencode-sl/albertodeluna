@@ -137,6 +137,7 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
         <span class="sig">
           Alberto de Luna,{" "}
           <a
+            class="text-link"
             href={INSTAGRAM}
             target="_blank"
             rel="noopener"
@@ -163,7 +164,7 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
       <Stars seed={3} count={80} class="lunas-stars" />
       <div class="lunas-stage">
         <div class="lunas-left">
-          <a class="eyebrow lunas-link" href={url("/como-puntuo")}>
+          <a class="eyebrow text-link lunas-link" href={url("/como-puntuo")}>
             Cómo puntúo →
           </a>
           <h2 class="flush">
@@ -314,7 +315,7 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
         </h2>
         <p>
           Algunas de sus notas más altas.{" "}
-          <a href={url("/restaurantes")}>
+          <a class="text-link" href={url("/restaurantes")}>
             <SwapLabel text={`Ver las ${reviews.length}`} />
           </a>
         </p>
@@ -349,7 +350,8 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
       </div>
     </section>
 
-    <section class="final" aria-label="Alberto de Luna">
+    <section class="final starry" aria-label="Alberto de Luna">
+      <Stars seed={17} />
       <div class="final-panel" data-close>
         <h2 data-meal-question>{mealQuestion()}</h2>
         <p class="final-lede">
@@ -579,12 +581,6 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
   }
   .lunas-link {
     width: fit-content;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.18em;
-  }
-  .lunas-link:hover {
-    color: var(--moon);
   }
   .hero-meta {
     position: absolute;
@@ -805,17 +801,6 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
   .manifesto-foot :global(.sig-brand) {
     color: var(--petrol);
   }
-  .sig a {
-    color: inherit;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.18em;
-    transition: color 0.2s;
-  }
-  .sig a:hover,
-  .sig a:focus-visible {
-    color: var(--glow-text);
-  }
   /* A moon crossing the page on its orbit, waxing as it goes */
   .orbit {
     display: block;
@@ -841,6 +826,7 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
 
   /* Lunas */
   .lunas {
+    --link-hover: var(--glow);
     position: relative;
     height: 340svh;
     background: radial-gradient(
@@ -1030,12 +1016,6 @@ const manifesto = `${reviews.length} restaurantes. ${years} años comiendo fuera
     max-width: 36ch;
     font: italic 400 22px/1.2 var(--font-serif);
     color: var(--ink-soft);
-  }
-  .reviews-head a {
-    color: var(--glow-text);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.18em;
   }
   .reviews-grid {
     display: grid;

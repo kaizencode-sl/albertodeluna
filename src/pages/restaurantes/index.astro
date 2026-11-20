@@ -179,7 +179,7 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
           </select>
         </div>
 
-        <button type="button" class="reset" data-reset>
+        <button type="button" class="reset text-link" data-reset>
           Quitar filtros
         </button>
       </aside>
@@ -244,7 +244,7 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
         </ol>
         <p class="none" data-none hidden>
           Nada por aquí. Prueba con menos filtros o{" "}
-          <button type="button" data-reset>
+          <button type="button" class="text-link" data-reset>
             empieza de nuevo
           </button>
           .
@@ -829,12 +829,6 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     padding: 16px 0;
     margin: -16px 0;
     font: 600 13px/1 var(--font-display);
-    color: var(--ink-soft);
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
-  .reset:hover {
-    color: var(--glow-text);
   }
 
   .count {
@@ -949,10 +943,11 @@ const searchText = ({ data: r }: (typeof reviews)[number]) => {
     color: var(--ink-soft);
   }
   .none button {
-    all: unset;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
     cursor: pointer;
-    color: var(--glow-text);
-    text-decoration: underline;
   }
   .more {
     display: block;

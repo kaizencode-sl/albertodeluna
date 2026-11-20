@@ -424,13 +424,37 @@ function wipes() {
   })
 }
 
+// The seal under a review lands like a score stamp, its moon waxing to the score
+function sealStamp() {
+  $$("[data-seal]").forEach((seal) => {
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: seal,
+          start: "top 88%",
+          toggleActions: PLAY_ONCE,
+        },
+      })
+      .from(seal, {
+        scale: 1.6,
+        opacity: 0,
+        duration: 0.6,
+        ease: "back.out(2.5)",
+      })
+      .add(fillStamp(seal), 0.2)
+  })
+}
+
 // A score stamp's moon waxes up to its score
 function fillStamp(stamp: HTMLElement | null) {
   const paths = stamp ? $$<SVGPathElement>("[data-moon]", stamp) : []
   const target = Number(stamp?.dataset.score ?? 0)
   const phase = { v: 0 }
+  // data-r: the moon's radius when it isn't the default 100 (the seal's)
   const draw = () =>
-    paths.forEach((p) => p.setAttribute("d", moonPath(phase.v / 10)))
+    paths.forEach((p) =>
+      p.setAttribute("d", moonPath(phase.v / 10, Number(p.dataset.r) || 100))
+    )
   draw()
   return gsap.to(phase, {
     v: target,
@@ -651,6 +675,7 @@ export function initMotion() {
       travellingType()
       charTitles()
       wipes()
+      sealStamp()
       reveals()
       closingPanel()
       phases()

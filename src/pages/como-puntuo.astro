@@ -1,5 +1,6 @@
 ---
 import Layout from "@/layouts/main.astro"
+import Stars from "@/components/stars.astro"
 import Moon from "@/components/moon.astro"
 import { breadcrumbs, INSTAGRAM } from "@/lib/seo"
 import { HANDLE } from "@/lib/seal"
@@ -89,7 +90,7 @@ const PLUSES = [
           {tens.map((r, i) => (
             <>
               {i > 0 && ", "}
-              <a href={reviewUrl(r.id)}>{r.data.name}</a>
+              <a class="text-link" href={reviewUrl(r.id)}>{r.data.name}</a>
             </>
           ))}
           .
@@ -160,7 +161,8 @@ const PLUSES = [
       </p>
     </section>
 
-    <section class="about" aria-labelledby="about-title">
+    <section class="about starry" aria-labelledby="about-title">
+      <Stars seed={5} />
       <span class="kicker">Quién soy</span>
       <h2 class="flush" id="about-title" data-reveal>
         Ni me vendo ni me caso con nadie
@@ -316,15 +318,6 @@ const PLUSES = [
   }
   .tens strong {
     color: var(--ink);
-  }
-  .tens a {
-    color: var(--ink);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.18em;
-  }
-  .tens a:hover {
-    color: var(--glow-text);
   }
 
   .price-text {

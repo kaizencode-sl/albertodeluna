@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths } from "astro"
 import Layout from "@/layouts/main.astro"
+import Stars from "@/components/stars.astro"
 import { getReviews, reviewUrl, formatScore, type Review } from "@/lib/reviews"
 import { SEAL_MIN, sealSvg, sealUrl, signUrl, type SealTheme } from "@/lib/seal"
 
@@ -35,9 +36,10 @@ const embed = (theme: SealTheme) =>
   noindex
   description={`${r.name} tiene ${formatScore(score)} lunas. Descarga su sello de Alberto de Luna o insértalo en tu web.`}
 >
-  <main class="page" data-seal-page>
+  <main class="page starry" data-seal-page>
+    <Stars seed={15} />
     <header class="intro">
-      <a class="back" href={reviewUrl(review.id)}>
+      <a class="back text-link" href={reviewUrl(review.id)}>
         ← Volver a la reseña
       </a>
       <span class="eyebrow">Sello para restaurantes</span>
@@ -203,6 +205,7 @@ const embed = (theme: SealTheme) =>
 
 <style>
   .page {
+    --link-hover: var(--glow);
     min-height: 100svh;
     padding: 110px 24px 12vh;
     background: var(--ink);
@@ -218,14 +221,9 @@ const embed = (theme: SealTheme) =>
     font: 600 12px/1 var(--font-display);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: inherit;
-    text-decoration: none;
   }
   .intro .eyebrow {
     display: block;
-  }
-  .back:hover {
-    text-decoration: underline;
   }
   h1 {
     margin: 12px 0 0;
